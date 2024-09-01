@@ -43,13 +43,13 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/CSS3-1572B6.svg?style=for-the-badge&logo=CSS3&logoColor=white" alt="CSS3">
-  <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=for-the-badge&logo=JavaScript&logoColor=black" alt="JavaScript">
   <img src="https://img.shields.io/badge/HTML5-E34F26.svg?style=for-the-badge&logo=HTML5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/CSS3-1572B6.svg?style=for-the-badge&logo=CSS3&logoColor=white" alt="CSS3">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=for-the-badge&logo=JavaScript&logoColor=black" alt="JavaScript">
   <img src="https://img.shields.io/badge/CSS3-1572B6.svg?style=for-the-badge&logo=CSS3&logoColor=white" alt="CSS">
-  <img src="https://img.shields.io/badge/Electron-47848F.svg?style=for-the-badge&logo=Electron&logoColor=white" alt="Electron">
   <img src="https://img.shields.io/badge/Next.js-000000.svg?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/Electron-47848F.svg?style=for-the-badge&logo=Electron&logoColor=white" alt="Electron">
 </p>
     
 
@@ -58,18 +58,20 @@
 ---
 # Project Overview
 
-The project is a Daraz e-commerce platform data scraper that extracts product information from the website. It utilizes web scraping techniques to gather relevant data, including product attributes and seller information. 
+The project appears to be a web scraping script, likely for extracting product information from Daraz, a Pakistani e-commerce platform. It uses Axios and Cheerio libraries to fetch and parse HTML content from product pages, then extracts relevant data using regular expressions.
 
-This project uses JavaScript and TypeScript technologies, as well as the PUPPETEER library for web scraping and parsing JSON-formatted data. The key features of this project include its ability to extract a wide range of product attributes, such as product rating and review count, brand and title, description and highlights, price and discount information, and availability and stock status. Additionally, it can handle errors during the scraping process by throwing informative error messages.
+This script defines a set of types for a product catalog system in TypeScript, including price-related, product-related, notification-related, and email-related types. The project utilizes environment variables for authentication with Bright Data and uses a random session ID to avoid rate limiting. It also returns the extracted product information as a Product object, which can be used by other parts of the application.
+
+The technologies used in this project include TypeScript, Axios, Cheerio, and Bright Data for web scraping. The key features of the project are its ability to fetch and parse HTML content, extract relevant data using regular expressions, and return the product information as a Product object. Additionally, it defines a set of types for a product catalog system in TypeScript, making it a comprehensive solution for managing products and notifications.
 
 ---
 # Key Features
-- **PriceHistoryItem**: An object representing a single price history item.
-- **User**: A type representing a user with an email property.
-- **Product**: A complex type representing various product data and properties.
-- **NotificationType**: An enumeration of possible notification types.
-- **EmailContent**: An object containing subject and body fields for email content.
-- **Price**: An object representing price information with text and value fields.
+- **Daraz Product Scraper**: A function that extracts product information from a specified URL on the Daraz e-commerce platform using Axios and Cheerio.
+- **Product Catalog System Types**: A set of types defined in TypeScript for a product catalog system, including price-related, product-related, notification-related, and email-related types.
+- **Price History**: The ability to track price history for products, with each item containing a single 'price' property.
+- **User Information**: The capacity to represent users with an email address.
+- **Product Metadata**: The capability to describe products with various properties, including title, category, image, pricing information, ratings/reviews data, and more.
+- **Notification Types**: Four possible notification types: welcome, change of stock, lowest price, and threshold met.
 
 ---
 # Folder Structure
@@ -163,89 +165,86 @@ Daraz_Scraper/
 **Getting Started**
 ====================
 
-Welcome to the Daraz Scraper project! This guide will walk you through the steps to install and run the project on your local machine.
+Welcome to the Daraz Scraper installation guide! This guide will walk you through setting up the project on your local machine.
 
 **Prerequisites**
------------------
+----------------
 
-Before we begin, make sure you have the following software installed:
+Before installing the project, make sure you have the following:
 
-* Node.js (v14 or higher) - [Download](https://nodejs.org/en/download/)
-* Docker (optional) - [Download](https://www.docker.com/get-started)
-* A code editor or IDE of your choice
+* **Node.js**: Download and install Node.js from [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
+* **npm**: The package manager for Node.js should be installed automatically with Node.js.
+* **Git**: Make sure Git is installed on your machine. You can download it from [https://git-scm.com/downloads](https://git-scm.com/downloads)
+* **Next.js**: A popular React-based framework for building server-rendered applications. Install it using npm by running `npm install next` in the terminal.
+* **Typescript**: A superset of JavaScript that adds optional static typing and other features. You can install it using npm with `npm install typescript --save-dev`
+* **Tailwind CSS**: A utility-first CSS framework for building custom UI components. Install it by running `npx tailwindcss init` in the terminal.
+* **Vercel CLI**: A command-line interface for deploying and managing Next.js applications on Vercel. You can install it using npm with `npm install vercel --save-dev`
 
 **Installation**
 ---------------
 
-### 1. Clone the repository
+### Step 1: Clone the repository
 
-Open a terminal and run the following command to clone the project:
+Clone the Daraz Scraper repository from GitHub:
 
 ```bash
-git clone https://github.com/Eemayas/Daraz_Scraper.git
+git clone https://github.com/Eemayas/Daraz_Scraper.git daraz-scraper
 ```
 
-### 2. Install dependencies
+### Step 2: Install dependencies
 
-Navigate into the project directory and install the required dependencies using npm or yarn:
+Navigate to the project directory and install the dependencies using npm:
 
 ```bash
-cd Daraz_Scraper
+cd daraz-scraper
 npm install
-# or
-yarn install
 ```
 
-### 3. Configure environment variables (optional)
+### Step 3: Configure environment variables
 
-If you're planning to use Docker, create a new file called `.env.local` in the root of the project with the following content:
+Create a new file called `.env` in the root of the project with your desired environment variables. For example:
 
 ```makefile
-DB_URL=mongodb://localhost:27017/
+NODE_ENV=development
+NEXT_PUBLIC_API_URL=https://api.example.com/
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=password
 ```
 
-Replace `DB_URL` with your MongoDB connection string if it's different.
+### Step 4: Configure Next.js
 
-### 4. Build and start the project
-
-Run the following command to build and start the project:
-
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-This will start the development server, and you should see a message indicating that the server is running on port 3000.
+Configure Next.js by running `npx next` in the terminal.
 
 **Running the Project**
 ----------------------
 
-To access the project in your browser, navigate to `http://localhost:3000` .
+To run the project locally, follow these steps:
 
-### Testing
+1. **Start Next.js**: Run `npx next dev` to start the development server.
+2. **Open browser**: Open your web browser and navigate to [http://localhost:3000](http://localhost:3000) to see the Daraz Scraper interface.
 
-We use Jest for testing. To run tests, execute:
+**Tests**
+-------
+
+To run tests, use Jest:
 
 ```bash
-npm run test
-# or
-yarn test
+npm test
 ```
 
 **Troubleshooting**
--------------------
+------------------
 
-Common issues and their solutions:
+### Common issues
 
-* **Error: Cannot find module 'mongodb'**: Make sure you have MongoDB installed on your local machine.
-* **Error: Cannot connect to MongoDB**: Check that the connection string in `.env.local` is correct, and try restarting the project.
-* **Error: Docker container failed to start**: Try deleting the `node_modules` directory and running `npm install` again.
+* **"Cannot find module 'next'"**: Make sure you have installed Next.js using npm.
+* **"Could not start server..."**: Run `npx next dev` with the `--debug` flag to get more detailed error messages.
 
-**Summary**
-----------
+Summary
+--------
 
-That's it! You've successfully installed and run the Daraz Scraper project on your local machine. If you encounter any issues during installation, refer to the troubleshooting section above for solutions. Happy coding!
+Congratulations! You have successfully set up and run the Daraz Scraper project. If you encounter any issues or have questions, feel free to reach out to me on GitHub.
 
 ---
 # API Reference
@@ -257,11 +256,35 @@ That's it! You've successfully installed and run the Daraz Scraper project on yo
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| None      |          |                             |
+| None      |          |                            |
 
-There are no additional parameters or endpoints in this code snippet. The API endpoint `/api/products` uses the `GET` HTTP method to fetch all products from the database.
+Note: There are no parameters required or optional for this API endpoint. It simply retrieves all products from the database.
 
-Note: This code snippet does not contain any other API methods like POST, PUT, DELETE etc.
+#### Update a product
+
+```http
+  PUT /api/products/:id
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `id`      | `string` | **Required**. ID of the product to update |
+
+Note: This endpoint is used to update a specific product in the database, identified by its unique ID.
+
+#### Send email notification
+
+```http
+  POST /api/send-email-notification
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| None      |          |                            |
+
+Note: This endpoint sends an email notification to users who have subscribed to updates for a specific product. It does not require any parameters.
+
+No other API references with HTTP methods were found in the provided code.
 #### Get all products
 
 ```http
@@ -270,11 +293,35 @@ Note: This code snippet does not contain any other API methods like POST, PUT, D
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| None      |          |                             |
+| None      |          |                            |
 
-There are no additional parameters or endpoints in this code snippet. The API endpoint `/api/products` uses the `GET` HTTP method to fetch all products from the database.
+Note: There are no parameters required or optional for this API endpoint. It simply retrieves all products from the database.
 
-Note: This code snippet does not contain any other API methods like POST, PUT, DELETE etc.
+#### Update a product
+
+```http
+  PUT /api/products/:id
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `id`      | `string` | **Required**. ID of the product to update |
+
+Note: This endpoint is used to update a specific product in the database, identified by its unique ID.
+
+#### Send email notification
+
+```http
+  POST /api/send-email-notification
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| None      |          |                            |
+
+Note: This endpoint sends an email notification to users who have subscribed to updates for a specific product. It does not require any parameters.
+
+No other API references with HTTP methods were found in the provided code.
 
 
 ---
