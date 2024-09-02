@@ -5,9 +5,9 @@
     
 
 <p align="center">
-    <h1 align="center">Daraz_Scraper</h1>
+    <h1>Daraz_Scraper</h1>
 </p>
-    
+
 
 <p align="center">
   <img src="https://img.shields.io/github/license/Eemayas/Daraz_Scraper?style=flat&color=0080ff" alt="license">
@@ -39,17 +39,17 @@
     
 
 <p align="center">
-	<em>Constructed using the following tools and technologies:</em>
+    <em>Constructed using the following tools and technologies:</em>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/HTML5-E34F26.svg?style=for-the-badge&logo=HTML5&logoColor=white" alt="HTML5">
-  <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" alt="TypeScript">
-  <img src="https://img.shields.io/badge/CSS3-1572B6.svg?style=for-the-badge&logo=CSS3&logoColor=white" alt="CSS3">
-  <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=for-the-badge&logo=JavaScript&logoColor=black" alt="JavaScript">
   <img src="https://img.shields.io/badge/CSS3-1572B6.svg?style=for-the-badge&logo=CSS3&logoColor=white" alt="CSS">
-  <img src="https://img.shields.io/badge/Next.js-000000.svg?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js">
+  <img src="https://img.shields.io/badge/CSS3-1572B6.svg?style=for-the-badge&logo=CSS3&logoColor=white" alt="CSS3">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=for-the-badge&logo=TypeScript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/HTML5-E34F26.svg?style=for-the-badge&logo=HTML5&logoColor=white" alt="HTML5">
+  <img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=for-the-badge&logo=JavaScript&logoColor=black" alt="JavaScript">
   <img src="https://img.shields.io/badge/Electron-47848F.svg?style=for-the-badge&logo=Electron&logoColor=white" alt="Electron">
+  <img src="https://img.shields.io/badge/Next.js-000000.svg?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js">
 </p>
     
 
@@ -58,20 +58,19 @@
 ---
 # Project Overview
 
-The project appears to be a web scraping script, likely for extracting product information from Daraz, a Pakistani e-commerce platform. It uses Axios and Cheerio libraries to fetch and parse HTML content from product pages, then extracts relevant data using regular expressions.
+The project is an e-commerce platform that enables users to buy and sell products, with a focus on product pricing, reviews, and stock management. It allows sellers to list their products with detailed information, such as price history, discount rates, and seller ratings, while also enabling buyers to review and rate the products they purchase. The project provides features like automatic email notifications for new orders, low stock levels, and threshold met, allowing users to stay informed about important events related to their business or purchases.
 
-This script defines a set of types for a product catalog system in TypeScript, including price-related, product-related, notification-related, and email-related types. The project utilizes environment variables for authentication with Bright Data and uses a random session ID to avoid rate limiting. It also returns the extracted product information as a Product object, which can be used by other parts of the application.
-
-The technologies used in this project include TypeScript, Axios, Cheerio, and Bright Data for web scraping. The key features of the project are its ability to fetch and parse HTML content, extract relevant data using regular expressions, and return the product information as a Product object. Additionally, it defines a set of types for a product catalog system in TypeScript, making it a comprehensive solution for managing products and notifications.
+The project uses Mongoose to interact with a MongoDB database, storing products in a collection called "products". It also utilizes Node.js, Axios, Cheerio, and Nodemailer libraries to handle product scraping from Daraz website, email generation, and sending emails based on notification types. The key features of the project include automated email notifications for various events, product pricing and review management, stock level tracking, and seller information display.
 
 ---
 # Key Features
-- **Daraz Product Scraper**: A function that extracts product information from a specified URL on the Daraz e-commerce platform using Axios and Cheerio.
-- **Product Catalog System Types**: A set of types defined in TypeScript for a product catalog system, including price-related, product-related, notification-related, and email-related types.
-- **Price History**: The ability to track price history for products, with each item containing a single 'price' property.
-- **User Information**: The capacity to represent users with an email address.
-- **Product Metadata**: The capability to describe products with various properties, including title, category, image, pricing information, ratings/reviews data, and more.
-- **Notification Types**: Four possible notification types: welcome, change of stock, lowest price, and threshold met.
+* **1. Authenticates with Bright Data proxy using username and password**: Utilizes a proxy service for secure and reliable web scraping.
+* **2. Retrieves HTML content from the provided URL**: Extracts webpage data using Axios, enabling access to dynamic web pages.
+* **3. Extracts product information from the script tags in the HTML using Cheerio**: Parses HTML to gather product details, streamlining data collection.
+* **4. Parses JSON data to extract various product attributes**: Converts JSON data into structured product info, facilitating easier analysis and use cases.
+* **5. Creates a Product object with the extracted information**: Organizes scraped data into a unified Product object, promoting efficient storage and processing.
+* **6. Returns the Product object or throws an error if scraping fails**: Provides a clear outcome for successful or failed web scraping attempts.
+* **7. Extracted Product Attributes**: Includes essential product details such as title, description, price, ratings, and more, enabling comprehensive understanding of e-commerce data.
 
 ---
 # Folder Structure
@@ -162,92 +161,103 @@ Daraz_Scraper/
 ```
 
 ---
-**Getting Started**
-====================
+Here's a detailed installation guide:
 
-Welcome to the Daraz Scraper installation guide! This guide will walk you through setting up the project on your local machine.
+**Getting Started**
+================
+
+Welcome to the Daraz Scraper installation guide! This guide will walk you through the process of setting up the project on your local machine.
 
 **Prerequisites**
-----------------
+================
 
-Before installing the project, make sure you have the following:
+Before installing the project, make sure you have the following software and tools installed:
 
-* **Node.js**: Download and install Node.js from [https://nodejs.org/en/download/](https://nodejs.org/en/download/)
-* **npm**: The package manager for Node.js should be installed automatically with Node.js.
-* **Git**: Make sure Git is installed on your machine. You can download it from [https://git-scm.com/downloads](https://git-scm.com/downloads)
-* **Next.js**: A popular React-based framework for building server-rendered applications. Install it using npm by running `npm install next` in the terminal.
-* **Typescript**: A superset of JavaScript that adds optional static typing and other features. You can install it using npm with `npm install typescript --save-dev`
-* **Tailwind CSS**: A utility-first CSS framework for building custom UI components. Install it by running `npx tailwindcss init` in the terminal.
-* **Vercel CLI**: A command-line interface for deploying and managing Next.js applications on Vercel. You can install it using npm with `npm install vercel --save-dev`
+* Node.js (LTS version) - [Download](https://nodejs.org/en/download/)
+* yarn (package manager) - [Install with npm](https://yarnpkg.com/en/docs/install)
+* Docker (for testing purposes) - [Download](https://www.docker.com/get-started)
+* MongoDB (database) - [Download](https://www.mongodb.com/try/download/community)
 
-**Installation**
----------------
+**Setup Instructions**
+=====================
 
-### Step 1: Clone the repository
+### Step 1: Clone the Repository
 
-Clone the Daraz Scraper repository from GitHub:
-
+Clone the Daraz Scraper repository from GitHub using the following command:
 ```bash
-git clone https://github.com/Eemayas/Daraz_Scraper.git daraz-scraper
+git clone https://github.com/Eemayas/Daraz_Scraper.git
 ```
+### Step 2: Install Dependencies
 
-### Step 2: Install dependencies
-
-Navigate to the project directory and install the dependencies using npm:
-
+Navigate to the project directory and install dependencies using yarn:
 ```bash
-cd daraz-scraper
-npm install
+cd Daraz_Scraper
+yarn install
 ```
+This will take a few minutes to complete.
 
-### Step 3: Configure environment variables
+### Step 3: Configure Environment Variables
 
-Create a new file called `.env` in the root of the project with your desired environment variables. For example:
-
+Create a new file called `.env` in the root directory of the project. Add the following environment variables:
 ```makefile
-NODE_ENV=development
-NEXT_PUBLIC_API_URL=https://api.example.com/
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=password
+MONGO_URI=mongodb://localhost:27017/
+API_KEY=your_api_key_here
 ```
+Replace `your_api_key_here` with your actual API key.
 
-### Step 4: Configure Next.js
+### Step 4: Build and Start the Project
 
-Configure Next.js by running `npx next` in the terminal.
+Run the following command to build and start the project:
+```bash
+yarn dev
+```
+This will start the development server, which you can access at [http://localhost:3000](http://localhost:3000).
 
 **Running the Project**
-----------------------
+=====================
 
-To run the project locally, follow these steps:
-
-1. **Start Next.js**: Run `npx next dev` to start the development server.
-2. **Open browser**: Open your web browser and navigate to [http://localhost:3000](http://localhost:3000) to see the Daraz Scraper interface.
+To run the project in production mode, use the following command:
+```bash
+yarn build
+yarn start
+```
+This will create a static HTML file and serve it using `next.js`.
 
 **Tests**
--------
+========
 
-To run tests, use Jest:
-
+The project uses Jest for testing. To run tests, navigate to the root directory of the project and run the following command:
 ```bash
-npm test
+yarn test
 ```
 
 **Troubleshooting**
-------------------
+==================
 
-### Common issues
+### Common Issues
 
-* **"Cannot find module 'next'"**: Make sure you have installed Next.js using npm.
-* **"Could not start server..."**: Run `npx next dev` with the `--debug` flag to get more detailed error messages.
+* **Error: Cannot find module 'node_modules'**: Make sure you have installed dependencies using yarn.
+* **Error: MongoDB connection failed**: Check your MongoDB installation and ensure that it is running on the correct port (27017).
+* **Error: API key not found**: Verify that you have added the API key to the `.env` file.
+
+### Resolving Issues
+
+If you encounter any issues during installation or while running the project, refer to the following troubleshooting steps:
+
+* Run `yarn install` again to re-install dependencies.
+* Restart MongoDB and ensure it is running on the correct port (27017).
+* Verify that you have added the API key to the `.env` file.
 
 Summary
 --------
 
-Congratulations! You have successfully set up and run the Daraz Scraper project. If you encounter any issues or have questions, feel free to reach out to me on GitHub.
+Congratulations! You have successfully installed the Daraz Scraper project. If you encounter any issues during installation or while running the project, refer to this guide for troubleshooting steps.
 
 ---
 # API Reference
+
+**File:** Github_repos\Daraz_Scraper\app\api\cron\route.ts
+
 #### Get all products
 
 ```http
@@ -256,35 +266,12 @@ Congratulations! You have successfully set up and run the Daraz Scraper project.
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| None      |          |                            |
+| None      | -        | No parameters required for this API endpoint |
 
-Note: There are no parameters required or optional for this API endpoint. It simply retrieves all products from the database.
+Note: There are no other HTTP methods (e.g., POST, PUT, DELETE) mentioned in the provided code snippet.
 
-#### Update a product
+**File:** Github_repos\Daraz_Scraper\app\api\cron\route.ts
 
-```http
-  PUT /api/products/:id
-```
-
-| Parameter | Type     | Description                |
-| :-------- | :------- | :------------------------- |
-| `id`      | `string` | **Required**. ID of the product to update |
-
-Note: This endpoint is used to update a specific product in the database, identified by its unique ID.
-
-#### Send email notification
-
-```http
-  POST /api/send-email-notification
-```
-
-| Parameter | Type     | Description                |
-| :-------- | :------- | :------------------------- |
-| None      |          |                            |
-
-Note: This endpoint sends an email notification to users who have subscribed to updates for a specific product. It does not require any parameters.
-
-No other API references with HTTP methods were found in the provided code.
 #### Get all products
 
 ```http
@@ -293,35 +280,10 @@ No other API references with HTTP methods were found in the provided code.
 
 | Parameter | Type     | Description                |
 | :-------- | :------- | :------------------------- |
-| None      |          |                            |
+| None      | -        | No parameters required for this API endpoint |
 
-Note: There are no parameters required or optional for this API endpoint. It simply retrieves all products from the database.
+Note: There are no other HTTP methods (e.g., POST, PUT, DELETE) mentioned in the provided code snippet.
 
-#### Update a product
-
-```http
-  PUT /api/products/:id
-```
-
-| Parameter | Type     | Description                |
-| :-------- | :------- | :------------------------- |
-| `id`      | `string` | **Required**. ID of the product to update |
-
-Note: This endpoint is used to update a specific product in the database, identified by its unique ID.
-
-#### Send email notification
-
-```http
-  POST /api/send-email-notification
-```
-
-| Parameter | Type     | Description                |
-| :-------- | :------- | :------------------------- |
-| None      |          |                            |
-
-Note: This endpoint sends an email notification to users who have subscribed to updates for a specific product. It does not require any parameters.
-
-No other API references with HTTP methods were found in the provided code.
 
 
 ---
@@ -344,29 +306,29 @@ Contributions are welcome! Here are several ways you can contribute:
     git clone https://github.com/your-username/Daraz_Scraper.git
     ```
     - Replace ``your-username`` with your GitHub username.
-4. **Create a New Branch**:
+3. **Create a New Branch**:
     - Create a new branch for your changes using the command:
     ```sh
     git checkout -b your-branch-name
     ```
-5. **Make Your Changes**:
+4. **Make Your Changes**:
     - Edit, add, or delete files as needed. Ensure your changes align with the project's contribution guidelines.
-6. **Commit Your Changes**:
+5. **Commit Your Changes**:
     - Stage your changes and commit them with a descriptive message:
       ```bash
       git add .
       git commit -m "Your descriptive message"
       ```
-7. **Push Your Changes:**
+6. **Push Your Changes:**
     - Push your branch to your forked repository:
       ```bash
       git push origin your-branch-name
       ```
-8. **Create a Pull Request (PR):**
+7. **Create a Pull Request (PR):**
     - Go to the original repository on GitHub and click “Compare & pull request.” Provide a clear description of the changes and submit the PR.
 
 Once your PR is reviewed and approved, it will be merged into the main branch.
-        
+    
 
 ---
 
@@ -383,7 +345,6 @@ Once your PR is reviewed and approved, it will be merged into the main branch.
 # License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
 
 
 ---
