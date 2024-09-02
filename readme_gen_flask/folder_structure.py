@@ -83,7 +83,7 @@ def print_folder_structure(
     return output
 
 
-def folder_structure_endpoint():
+def folder_structure_endpoint_handler():
     repository_url = request.args.get("repository_url")
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
@@ -93,7 +93,7 @@ def folder_structure_endpoint():
     if not global_variables.global_cloned_repo_path:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        
+
         async def main():
             async with aiohttp.ClientSession() as session:
                 return await clone_github_repo(repository_url)
@@ -111,10 +111,14 @@ def folder_structure_endpoint():
         folder_structure_markdown = (
             "# Folder Structure\n" + "```sh\n" + folder_structure_str + "\n" + "```"
         )
-        # print(folder_structure_markdown)
+        global_variables.global_folder_structure_str = folder_structure
+        return folder_structure_markdown
     else:
         print("Repository cloning failed or was skipped.")
 
+
+def folder_structure_endpoint():
+    folder_structure_markdown = folder_structure_endpoint_handler()
     if folder_structure_markdown:
         return jsonify({"folder_structure_markdown": folder_structure_markdown})
     else:

@@ -14,6 +14,11 @@ from project_name import get_project_name
 from project_badge import get_project_badges
 from project_languages import get_project_languages
 from project_overview import project_overview
+from project_key_feature import project_key_feature
+
+from project_contibuting import contributing_guide
+from project_contibutors import project_contributors
+from project_license import project_license
 
 
 app = Flask(__name__)
@@ -29,7 +34,7 @@ def github_metadata_endpoint_main():
     return github_metadata_endpoint()
 
 
-@app.route("/clone_repo", methods=["POST"])
+@app.route("/clone_repo", methods=["GET"])
 def clone_repo_endpoint_main():
     return clone_repo_endpoint()
 
@@ -77,6 +82,26 @@ def get_project_languages_endpoint_main():
 @app.route("/project_overview", methods=["GET"])
 def project_overview_endpoint_main():
     return project_overview()
+
+
+@app.route("/project_key_feature", methods=["GET"])
+def project_key_feature_endpoint_main():
+    return project_key_feature()
+
+
+@app.route("/contributing_guide", methods=["GET"])
+def contributing_guide_endpoint_main():
+    return contributing_guide()
+
+
+@app.route("/project_contributors", methods=["GET"])
+def project_contributors_endpoint_main():
+    return project_contributors()
+
+
+@app.route("/project_license", methods=["GET"])
+def project_license_endpoint_main():
+    return project_license()
 
 
 if __name__ == "__main__":

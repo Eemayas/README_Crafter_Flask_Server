@@ -88,27 +88,6 @@ def generate_project_overview(
     """
     return overview_component.generator.call({"input_str": combined_summary})
 
-
-# # Initialize OverviewQA component with model configuration
-# overview_qa = OverviewQA(**model)
-
-# if global_variables.global_combined_summary:
-#     # Generate the project overview
-#     project_overview = generate_project_overview(
-#         global_variables.global_combined_summary, overview_component=overview_qa
-#     )
-#     # Clean and format the project overview text
-#     project_overview = get_description_data(project_overview)
-#     project_overview_markdown = (
-#         "# Project Overview\n\n"
-#         + project_overview.strip().replace("\n\n", "\n\n").replace("  ", " ")
-#     )
-#     # Print and display the project overview
-#     print(project_overview_markdown)
-# else:
-#     print("No combined summary available to generate the project overview.")
-
-
 def project_overview():
     repository_url = request.args.get("repository_url")
 

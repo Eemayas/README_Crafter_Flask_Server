@@ -188,87 +188,147 @@ summary_qa = SummaryQA(**model)
 
 def summary_generation_handler():
     repository_url = request.args.get("repository_url")
+    redo = request.args.get("redo", "false").lower() == "true"
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
     if not global_variables.global_metadata:
         github_metadata_endpoint_handler()
-        # repository_url = request.args.get("repository_url")
-        # if not repository_url:
-        #     return jsonify({"error": "Missing 'repository_url' parameter"}), 400
-
-        # loop = asyncio.new_event_loop()
-        # asyncio.set_event_loop(loop)
-
-        # async def main():
-        #     async with aiohttp.ClientSession() as session:
-        #         metadata = await fetch_git_repository_metadata(
-        #             session, repository_url
-        #         )
-        #         return metadata
-
-        # metadata = loop.run_until_complete(main())
-        # global_variables.global_metadata = metadata
 
     if not global_variables.global_cloned_repo_path:
         clone_repo_endpoint_handler()
-        # loop = asyncio.new_event_loop()
-        # asyncio.set_event_loop(loop)
 
-        # async def main():
-        #     async with aiohttp.ClientSession() as session:
-        #         return await clone_github_repo(repository_url)
+    excel_path = f"output/{global_variables.global_metadata.name}_summary.xlsx"
 
-        # cloned_repo_path = loop.run_until_complete(main())
-        # global_variables.global_cloned_repo_path = cloned_repo_path
+    # if global_variables.global_cloned_repo_path:
+    #     path = Path(global_variables.global_cloned_repo_path)
+    #     if not path.is_dir():
+    #         return jsonify({"error": f"The path {path} is not a directory."}), 400
 
-    if global_variables.global_cloned_repo_path:
-        path = Path(global_variables.global_cloned_repo_path)
-        if not path.is_dir():
-            return jsonify({"error": f"The path {path} is not a directory."}), 400
+    #     summary = generate_summary(
+    #         path,
+    #         ignore_list=ignore_list_folder_structure,
+    #         summary_component=summary_qa,
+    #         ignore_extensions=ignore_list_extensions,
+    #     )
 
-        summary = generate_summary(
-            path,
-            ignore_list=ignore_list_folder_structure,
-            summary_component=summary_qa,
-            ignore_extensions=ignore_list_extensions,
-        )
+    #     table_summary = PrettyTable()
+    #     table_summary.field_names = ["File", "Description"]
 
-        table_summary = PrettyTable()
-        table_summary.field_names = ["File", "Description"]
+    #     for item in summary:
+    #         table_summary.add_row([item["file"], item["description"]])
 
-        for item in summary:
-            table_summary.add_row([item["file"], item["description"]])
+    #     print(table_summary)
+    # else:
+    #     return jsonify({"error": "Repository cloning failed or was skipped."}), 500
 
-        print(table_summary)
-    else:
-        return jsonify({"error": "Repository cloning failed or was skipped."}), 500
+    # # Assuming `summary` and `cloned_repo_path` are defined earlier in the code
+    # save_summary_to_excel_and_print_table(
+    #     summary,
+    #     global_variables.global_cloned_repo_path,
+    #     excel_path=f"output/{global_variables.global_metadata.name}_summary.xlsx",
+    # )
 
-    # Assuming `summary` and `cloned_repo_path` are defined earlier in the code
-    save_summary_to_excel_and_print_table(
-        summary,
-        global_variables.global_cloned_repo_path,
-        excel_path=f"output/{global_variables.global_metadata.name}_summary.xlsx",
-    )
+    # if summary:
+    #     # Combine summaries, ignoring "Not a File" or error messages
+    #     combined_summary = " ".join(
+    #         [
+    #             get_description_data(item["description"])
+    #             for item in summary
+    #             if get_description_data(item["description"])
+    #             and get_description_data(item["description"]) != "Not a File"
+    #             and get_description_data(item["description"]) != "."
+    #             and not get_description_data(item["description"]).startswith(
+    #                 "HTTP error 401"
+    #             )
+    #         ]
+    #     )
+    #     global_variables.global_combined_summary = combined_summary
+    #     return combined_summary
+    # else:
+    #     return jsonify({"error": "Summary generation failed."}), 500
+    # Check if redo is True or if Excel file does not exist
+    if redo or not os.path.exists(excel_path):
+        if global_variables.global_cloned_repo_path:
+            path = Path(global_variables.global_cloned_repo_path)
+            if not path.is_dir():
+                return jsonify({"error": f"The path {path} is not a directory."}), 400
 
-    if summary:
-        # Combine summaries, ignoring "Not a File" or error messages
-        combined_summary = " ".join(
-            [
-                get_description_data(item["description"])
-                for item in summary
-                if get_description_data(item["description"])
-                and get_description_data(item["description"]) != "Not a File"
-                and get_description_data(item["description"]) != "."
-                and not get_description_data(item["description"]).startswith(
-                    "HTTP error 401"
+            summary = generate_summary(
+                path,
+                ignore_list=ignore_list_folder_structure,
+                summary_component=summary_qa,
+                ignore_extensions=ignore_list_extensions,
+            )
+
+            table_summary = PrettyTable()
+            table_summary.field_names = ["File", "Description"]
+
+            for item in summary:
+                table_summary.add_row([item["file"], item["description"]])
+
+            # print(table_summary)
+
+            save_summary_to_excel_and_print_table(
+                summary,
+                global_variables.global_cloned_repo_path,
+                excel_path=excel_path,
+            )
+
+            if summary:
+                # Combine summaries, ignoring "Not a File" or error messages
+                combined_summary = " ".join(
+                    [
+                        get_description_data(item["description"])
+                        for item in summary
+                        if get_description_data(item["description"])
+                        and get_description_data(item["description"]) != "Not a File"
+                        and get_description_data(item["description"]) != "."
+                        and not get_description_data(item["description"]).startswith(
+                            "HTTP error 401"
+                        )
+                    ]
                 )
-            ]
-        )
-        global_variables.global_combined_summary = combined_summary
-        return combined_summary
+                global_variables.global_combined_summary = combined_summary
+                return combined_summary
+            else:
+                return jsonify({"error": "Summary generation failed."}), 500
+        else:
+            return jsonify({"error": "Repository cloning failed or was skipped."}), 500
     else:
-        return jsonify({"error": "Summary generation failed."}), 500
+        # Load the summary from the existing Excel file
+        try:
+            summary_df = pd.read_excel(excel_path, engine="openpyxl")
+            summary_data = summary_df.to_dict(orient="records")
+
+            table_summary = PrettyTable()
+            table_summary.field_names = ["File", "Description"]
+
+            for item in summary_data:
+                table_summary.add_row([item["File"], item["Description"]])
+
+            # print(table_summary)
+
+            # Extract combined summary from the loaded data
+            combined_summary = " ".join(
+                [
+                    get_description_data(item["Description"])
+                    for item in summary_data
+                    if get_description_data(item["Description"])
+                    and get_description_data(item["Description"]) != "Not a File"
+                    and get_description_data(item["Description"]) != "."
+                    and not get_description_data(item["Description"]).startswith(
+                        "HTTP error 401"
+                    )
+                ]
+            )
+            global_variables.global_combined_summary = combined_summary
+            return combined_summary
+        except Exception as e:
+            return (
+                jsonify({"error": f"Failed to load or process Excel file: {str(e)}"}),
+                500,
+            )
 
 
 def summary_generation():
