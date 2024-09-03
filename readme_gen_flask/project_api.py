@@ -1,0 +1,249 @@
+from lightrag.core.generator import Generator
+from lightrag.core.component import Component
+import os
+from pathlib import Path
+from typing import List, Dict
+from prettytable import PrettyTable
+from tqdm import tqdm
+from github_metadata import github_metadata_endpoint_handler
+from clone_github import clone_repo_endpoint_handler
+from utils.llama_configurations import get_description_data, model
+from constants import ignore_list_folder_structure, specific_ignores_api
+import pandas as pd
+from prettytable import PrettyTable
+from flask import Flask, jsonify, request
+import global_variables
+from constants import api_ignore_extensions
+
+
+# Define the template for API reference extraction
+api_template = r"""
+You are an HTTP method extraction assistant specializing in coding files. Your task is to identify and extract information about HTTP methods from the provided code. Focus only on endpoints that use HTTP methods (GET, POST, PUT, DELETE, etc.).
+
+For each API reference found, provide the following details:
+1. HTTP endpoint
+2. Purpose of the HTTP endpoints
+3. Parameters
+4. Parameter types
+5. Parameter descriptions
+6. HTTP method
+
+If the code does not include any API references or if no HTTP methods are present, return "No API Reference."
+
+Format:
+
+#### {Purpose of the API}
+
+```http
+  {HTTP method} {HTTP endpoint}
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+{parameter_rows}
+
+Example:
+
+#### Get all items
+
+```http
+  GET /api/items
+```
+
+| Parameter | Type     | Description                |
+| :-------- | :------- | :------------------------- |
+| `api_key` | `string` | **Required**. Your API key |
+| `limit`   | `integer`| **Optional**. Limit the number of items |
+
+Code:
+{{input_str}}
+
+"""
+
+
+class APIReferenceExtractorQA(Component):
+    """Component for extracting API references from code."""
+
+    def __init__(self, model_client, model_kwargs: dict):  # type: ignore
+        super().__init__()
+        self.generator = Generator(
+            model_client=model_client,
+            model_kwargs=model_kwargs,
+            template=api_template,
+        )
+
+    def call(self, input: str) -> str:
+        """Extract API references from the provided code."""
+        return self.generator.call({"input_str": input})
+
+    async def acall(self, input: str) -> str:
+        """Asynchronous extraction of API references."""
+        return await self.generator.acall({"input_str": input})
+
+
+def generate_api_reference(
+    path: Path,
+    ignore_list: List[str],
+    api_reference_extractor_component: APIReferenceExtractorQA,
+    api_ignore_extensions: List[str],
+) -> List[Dict[str, str]]:
+    """
+    Generate an API reference of files in the given path using the model.
+
+    This function processes files in the specified directory, excluding those
+    listed in the ignore list and files with extensions specified in
+    `api_ignore_extensions`. It uses the `APIReferenceExtractorQA` component
+    to extract API references from the file content.
+
+    Parameters:
+    path (Path): The directory path containing the files to process.
+    ignore_list (List[str]): List of folder names or file names to ignore.
+    api_reference_extractor_component (APIReferenceExtractorQA): The component used to extract API references.
+    api_ignore_extensions (List[str]): List of file extensions to ignore.
+
+    Returns:
+    List[Dict[str, str]]: A list of dictionaries where each dictionary contains
+    the file path and the extracted API reference or an error message.
+    """
+    api_reference = []
+    files_to_process = []
+
+    for root, dirs, files in os.walk(path):
+        relative_root = os.path.relpath(root, path)
+
+        # Skip directories that are in the ignore list
+        if any(ignored in relative_root.split(os.sep) for ignored in ignore_list):
+            continue
+
+        for file in files:
+            file_path = Path(root) / file
+
+            # Skip files that are in the ignore list or have ignored extensions
+            if any(ignored in file_path.parts for ignored in ignore_list):
+                continue
+
+            if any(ignore in file_path.name for ignore in specific_ignores_api):
+                continue
+
+            if file_path.suffix.lower() in api_ignore_extensions:
+                continue
+
+            files_to_process.append(file_path)
+
+    # Create a progress bar for processing files
+    pbar = tqdm(files_to_process, unit="file")
+    for file_path in pbar:
+        # Update the progress bar description
+        pbar.set_description(f"Processing files - {file_path}")
+        try:
+            with open(file_path, "r") as f:
+                file_content = f.read()
+
+            # Extract API references from the file content
+            api_text = api_reference_extractor_component.call(file_content)
+            api_reference.append({"file": file_path, "api_reference": api_text})
+        except Exception as e:
+            # Append an error message if file processing fails
+            api_reference.append(
+                {"file": file_path, "api_reference": f"Error processing file: {str(e)}"}
+            )
+
+    return api_reference
+
+
+# Initialize APIReferenceExtractorQA component with model configuration
+api_reference_extractor_qa = APIReferenceExtractorQA(**model)
+
+
+def get_api_references():
+    """
+    Endpoint to return the API reference data as a dictionary and save it to an Excel file.
+    """
+    repository_url = request.args.get("repository_url")
+    redo = request.args.get("redo", "false").lower() == "true"
+    if not repository_url:
+        return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+
+    if not global_variables.global_metadata:
+        github_metadata_endpoint_handler()
+
+    if not global_variables.global_cloned_repo_path:
+        clone_repo_endpoint_handler()
+
+    excel_path = Path(
+        f"output/{global_variables.global_metadata.name}_api_reference_data.xlsx"
+    )
+
+    # Check if the Excel file exists and if redo is not requested
+    if excel_path.exists() and not redo:
+        # Load the data from the existing Excel file
+        df_api_data = pd.read_excel(excel_path, engine="openpyxl")
+        api_data_for_excel = df_api_data.to_dict(orient="records")
+        return jsonify(
+            {
+                "message": f"Data loaded from {str(excel_path)}",
+                "api_reference": api_data_for_excel,
+            }
+        )
+
+    if global_variables.global_cloned_repo_path:
+        path = Path(global_variables.global_cloned_repo_path)
+        if not path.is_dir():
+            return (
+                jsonify(
+                    {
+                        "error": f"The path {global_variables.global_cloned_repo_path} is not a directory."
+                    }
+                ),
+                400,
+            )
+
+        # Generate API references
+        api_reference = generate_api_reference(
+            path,
+            ignore_list=ignore_list_folder_structure,
+            api_reference_extractor_component=api_reference_extractor_qa,
+            api_ignore_extensions=api_ignore_extensions,
+        )
+
+        # Initialize PrettyTable for formatted output
+        api_table = PrettyTable()
+        api_table.field_names = ["File", "API Reference"]
+
+        # Create a list to hold data for further processing (e.g., saving to Excel)
+        api_data_for_excel = []
+
+        for item in api_reference:
+            # Process the API reference text to get description data
+            description_data = get_description_data(item["api_reference"])
+            if "No API Reference" in description_data:
+                continue
+            # Add rows to the PrettyTable
+            api_table.add_row([item["file"], description_data])
+            api_data_for_excel.append(
+                {"File": item["file"], "api_reference": description_data}
+            )
+
+        # Save to Excel
+        if api_data_for_excel:
+            # Convert any Path objects in api_data_for_excel to strings
+            for data in api_data_for_excel:
+                if isinstance(data.get("File"), Path):
+                    data["File"] = str(data["File"])
+
+            # Convert the list of dictionaries to a DataFrame
+            df_api_data = pd.DataFrame(api_data_for_excel)
+
+            # Save the DataFrame to an Excel file with the specified path
+            df_api_data.to_excel(excel_path, index=False, engine="openpyxl")
+
+            print(f"API reference data saved to {str(excel_path)}")
+
+        return jsonify(
+            {
+                "message": "API reference data generated",
+                "api_reference": api_data_for_excel,
+            }
+        )
+    else:
+        return jsonify({"error": "Repository cloning failed or was skipped."}), 400

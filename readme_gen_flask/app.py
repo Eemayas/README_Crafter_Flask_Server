@@ -15,7 +15,7 @@ from project_badge import get_project_badges
 from project_languages import get_project_languages
 from project_overview import project_overview
 from project_key_feature import project_key_feature
-
+from project_api import get_api_references
 from project_contibuting import contributing_guide
 from project_contibutors import project_contributors
 from project_license import project_license
@@ -89,6 +89,11 @@ def project_key_feature_endpoint_main():
     return project_key_feature()
 
 
+@app.route("/api_references", methods=["GET"])
+def get_api_references_endpoint_main():
+    return get_api_references()
+
+
 @app.route("/contributing_guide", methods=["GET"])
 def contributing_guide_endpoint_main():
     return contributing_guide()
@@ -110,4 +115,4 @@ if __name__ == "__main__":
     ollama_thread = threading.Thread(target=ollama)
     ollama_thread.start()
 
-    app.run(port=5001, debug=True)
+    app.run(debug=True)
