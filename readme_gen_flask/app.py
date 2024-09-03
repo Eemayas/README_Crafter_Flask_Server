@@ -6,7 +6,7 @@ from utils.llama_configurations import ollama
 
 from github_metadata import github_metadata_endpoint
 from clone_github import clone_repo_endpoint
-from folder_structure import folder_structure_endpoint
+from folder_structure import folder_structure_endpoint, folder_structure_dict_endpoint
 from ollam_check import ask_question
 from summary_generation import summary_generation, stream_data
 from project_image import get_project_icon
@@ -15,7 +15,7 @@ from project_badge import get_project_badges
 from project_languages import get_project_languages
 from project_overview import project_overview
 from project_key_feature import project_key_feature
-from project_api import get_api_references
+from project_api import get_api_references, update_https_requests_endpoint
 from project_contibuting import contributing_guide
 from project_contibutors import project_contributors
 from project_license import project_license
@@ -42,6 +42,11 @@ def clone_repo_endpoint_main():
 @app.route("/folder_structure", methods=["GET"])
 def folder_structure_endpoint_main():
     return folder_structure_endpoint()
+
+
+@app.route("/folder_structure_dict", methods=["GET"])
+def folder_structure_dict_endpoint_main():
+    return folder_structure_dict_endpoint()
 
 
 @app.route("/ask", methods=["POST"])
@@ -92,6 +97,11 @@ def project_key_feature_endpoint_main():
 @app.route("/api_references", methods=["GET"])
 def get_api_references_endpoint_main():
     return get_api_references()
+
+
+@app.route("/update_https_requests", methods=["GET"])
+def update_https_requests_endpoint_main():
+    return update_https_requests_endpoint()
 
 
 @app.route("/contributing_guide", methods=["GET"])

@@ -155,6 +155,88 @@ def generate_api_reference(
 api_reference_extractor_qa = APIReferenceExtractorQA(**model)
 
 
+import pandas as pd
+from pathlib import Path
+
+
+def update_https_requests_endpoint():
+    repository_url = request.args.get("repository_url")
+    file_path = request.args.get("file_path")
+    if not repository_url:
+        return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+    if not file_path:
+        return jsonify({"error": "Missing 'file_path' parameter"}), 400
+
+    if not global_variables.global_metadata:
+        github_metadata_endpoint_handler()
+
+    excel_path = Path(
+        f"output/{global_variables.global_metadata.name}_api_reference_data.xlsx"
+    )
+
+    file_path = Path(file_path)
+    excel_path = Path(excel_path)
+
+    # Check if the file exists
+    if not file_path.is_file():
+        return jsonify({"error": f"The file {file_path} does not exist."}), 400
+
+    # Initialize APIReferenceExtractorQA component
+    api_reference_extractor_qa = APIReferenceExtractorQA(**model)
+
+    try:
+        # Extract HTTPS requests using APIReferenceExtractorQA
+        with open(file_path, "r") as f:
+            file_content = f.read()
+
+        api_text = api_reference_extractor_qa.call(file_content)
+
+        # Check if the Excel file exists
+        if excel_path.exists():
+            # Load existing data
+            df_api_data = pd.read_excel(excel_path, engine="openpyxl")
+            existing_data = df_api_data.to_dict(orient="records")
+
+            # Check if the file path already exists
+            updated = False
+            for entry in existing_data:
+                if entry.get("File") == str(file_path):
+                    # Update existing entry
+                    entry["api_reference"] = api_text
+                    updated = True
+                    break
+
+            if not updated:
+                # Add new entry if file path does not exist
+                existing_data.append(
+                    {"File": str(file_path), "api_reference": api_text}
+                )
+
+            # Save the updated data to Excel
+            df_updated_data = pd.DataFrame(existing_data)
+            df_updated_data.to_excel(excel_path, index=False, engine="openpyxl")
+            return jsonify(
+                {
+                    "message": "Excel file updated with HTTPS request data.",
+                    "updated_file": str(file_path),
+                    "new_data": {"File": str(file_path), "api_reference": api_text},
+                }
+            )
+        else:
+            # Create a new Excel file with the data
+            new_data = [{"File": str(file_path), "api_reference": api_text}]
+            df_new_data = pd.DataFrame(new_data)
+            df_new_data.to_excel(excel_path, index=False, engine="openpyxl")
+            return jsonify(
+                {
+                    "message": "New Excel file created and data added.",
+                    "created_file": str(excel_path),
+                }
+            )
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
 def get_api_references():
     """
     Endpoint to return the API reference data as a dictionary and save it to an Excel file.
