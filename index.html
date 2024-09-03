@@ -1,0 +1,33 @@
+<!-- @format -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Progress Tracker</title>
+  </head>
+  <body>
+    <h1>Task Progress:</h1>
+    <p id="progress"></p>
+    <p id="eta"></p>
+    <p id="time_passed"></p>
+    <p id="speed"></p>
+
+    <script>
+      const eventSource = new EventSource("http://127.0.0.1:5000/progress");
+
+      eventSource.onmessage = function (event) {
+        const data = JSON.parse(event.data);
+        document.getElementById(
+          "progress"
+        ).textContent = `Progress: ${data.progress.toFixed(2)}%`;
+        document.getElementById("eta").textContent = `ETA: ${data.eta}`;
+        document.getElementById(
+          "time_passed"
+        ).textContent = `Time Passed: ${data.time_passed}`;
+        document.getElementById("speed").textContent = `Speed: ${data.speed}`;
+      };
+    </script>
+  </body>
+</html>

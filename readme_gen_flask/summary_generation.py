@@ -1,9 +1,10 @@
+import json
 from lightrag.core.generator import Generator
 from lightrag.core.component import Component
 from lightrag.components.model_client import OllamaClient
 import os
 from pathlib import Path
-from typing import List, Dict
+from typing import List, Dict, Generator
 from prettytable import PrettyTable
 from tqdm import tqdm
 from github_metadata import github_metadata_endpoint_handler
@@ -12,9 +13,7 @@ from utils.llama_configurations import model, get_description_data
 from constants import ignore_list_folder_structure, ignore_list_extensions
 import pandas as pd
 from prettytable import PrettyTable
-from flask import jsonify, request, Response
-import asyncio
-import aiohttp
+from flask import jsonify, request, Response, stream_with_context
 import global_variables
 import time
 
@@ -200,54 +199,6 @@ def summary_generation_handler():
 
     excel_path = f"output/{global_variables.global_metadata.name}_summary.xlsx"
 
-    # if global_variables.global_cloned_repo_path:
-    #     path = Path(global_variables.global_cloned_repo_path)
-    #     if not path.is_dir():
-    #         return jsonify({"error": f"The path {path} is not a directory."}), 400
-
-    #     summary = generate_summary(
-    #         path,
-    #         ignore_list=ignore_list_folder_structure,
-    #         summary_component=summary_qa,
-    #         ignore_extensions=ignore_list_extensions,
-    #     )
-
-    #     table_summary = PrettyTable()
-    #     table_summary.field_names = ["File", "Description"]
-
-    #     for item in summary:
-    #         table_summary.add_row([item["file"], item["description"]])
-
-    #     print(table_summary)
-    # else:
-    #     return jsonify({"error": "Repository cloning failed or was skipped."}), 500
-
-    # # Assuming `summary` and `cloned_repo_path` are defined earlier in the code
-    # save_summary_to_excel_and_print_table(
-    #     summary,
-    #     global_variables.global_cloned_repo_path,
-    #     excel_path=f"output/{global_variables.global_metadata.name}_summary.xlsx",
-    # )
-
-    # if summary:
-    #     # Combine summaries, ignoring "Not a File" or error messages
-    #     combined_summary = " ".join(
-    #         [
-    #             get_description_data(item["description"])
-    #             for item in summary
-    #             if get_description_data(item["description"])
-    #             and get_description_data(item["description"]) != "Not a File"
-    #             and get_description_data(item["description"]) != "."
-    #             and not get_description_data(item["description"]).startswith(
-    #                 "HTTP error 401"
-    #             )
-    #         ]
-    #     )
-    #     global_variables.global_combined_summary = combined_summary
-    #     return combined_summary
-    # else:
-    #     return jsonify({"error": "Summary generation failed."}), 500
-    # Check if redo is True or if Excel file does not exist
     if redo or not os.path.exists(excel_path):
         if global_variables.global_cloned_repo_path:
             path = Path(global_variables.global_cloned_repo_path)
@@ -423,166 +374,185 @@ def stream_data():
     return Response(generate(), mimetype="text/event-stream")
 
 
-# # %% [markdown]
-# # <!-- @format -->
-# #
-# # #### Retry Summarization for Errors
-# #
-# # This section handles cases where summaries couldn't be generated initially, either due to errors or blank descriptions.
-# #
+def generate_summary_stream(
+    path: Path,
+    ignore_list: List[str],
+    summary_component: SummaryQA,
+    ignore_extensions: List[str],
+) -> Generator[Dict[str, str], None, None]:
 
-# # %%
-# from prettytable import PrettyTable
+    summary = []
+    files_to_process = []
 
-# # Check if there is any summary data available
-# if summary:
+    for root, dirs, files in os.walk(path):
+        relative_root = os.path.relpath(root, path)
 
-#     # Variable to store rows with empty or error descriptions before adding to the table
-#     blank_error_summary = []
+        if any(ignored in relative_root.split(os.sep) for ignored in ignore_list):
+            continue
 
-#     # Iterate over each item in the summary
-#     for item in summary:
+        if relative_root == ".":
+            summary.append({"file": "Modules", "description": "."})
+        else:
+            summary.append({"file": relative_root, "description": "Not a File"})
 
-#         # Retrieve the description data from the item
-#         description_data = get_description_data(item["description"])
+        for file in files:
+            file_path = Path(root) / file
 
-#         # Check if the description is empty or contains an error
-#         if is_empty_or_error(description_data):
+            if any(ignored in file_path.parts for ignored in ignore_list):
+                continue
 
-#             # Save the row data (file path and description) into a variable
-#             row = [item["file"], description_data]
+            if file_path.suffix.lower() in ignore_extensions:
+                continue
 
-#             # Append the row to the list of blank or error summaries
-#             blank_error_summary.append(row)
+            files_to_process.append(file_path)
+    pbar = tqdm(files_to_process, unit="file")
+    for file_path in pbar:
+        pbar.set_description(f"Processing file - {file_path}")
+        n = pbar.format_dict.get("n", 0)
+        total = pbar.format_dict.get(
+            "total", 1
+        )  # Default to 1 to avoid division by zero
+        percentage = (n / total) * 100 if total else 0
+        elapsed = pbar.format_dict.get("elapsed", 0.0)
+        rate = pbar.format_dict.get("rate", 0.0)
+        remaining = total - n
+        try:
+            with open(file_path, "r") as f:
+                file_content = f.read()
 
-#     # Initialize PrettyTable to format the output
-#     retry_table = PrettyTable()
+            summary_text = summary_component.call(file_content)
+            summary.append(
+                {
+                    "file": str(file_path),
+                    "description": get_description_data(summary_text),
+                }
+            )
 
-#     # Set the field names (column headers) for the table
-#     retry_table.field_names = ["File", "Description"]
+            # Send intermediate progress as SSE
+            yield f"""data: {json.dumps({
+                'file': str(file_path), 
+                'description':get_description_data(summary_text),
+                "percentage":percentage,
+                "n":n,
+                "total":total,
+                "elapsed":elapsed,
+                "rate":rate,
+                "remaining":remaining})}\n\n"""
 
-#     # Add the saved rows (those with blank or error descriptions) to the table
-#     for row in blank_error_summary:
+        except Exception as e:
+            summary.append({"file": str(file_path), "description": f"Error: {str(e)}"})
+            yield f"""data: {json.dumps({
+                'file': str(file_path), 
+                'description': f'Error: {str(e)}',          
+                "percentage":percentage,
+                "n":n,
+                "total":total,
+                "elapsed":elapsed,
+                "rate":rate,
+                "remaining":remaining})}\n\n"""
 
-#         retry_table.add_row(row)
+    global_variables.global_combined_summary = summary
 
-#     # Print the PrettyTable with the rows that have blank or error descriptions
-#     print(retry_table)
-
-# else:
-#     # Print a message if no summary data is available
-#     print("NO SUMMARY DATA AVAILABLE")
-
-# # %% [markdown]
-# # <!-- @format -->
-# #
-# # #### Generate Summary for Specific Files
-# #
-# # This section provides functionality to manually generate or update summaries for individual files based on user input.
-# #
-
-# # %%
-# from typing import List, Dict
-# from pathlib import Path
-# from prettytable import PrettyTable
-
-
-# def generate_summary_for_file(
-#     file_path: Path, qa_component: SummaryQA, existing_summaries: List[Dict[str, str]]
-# ) -> List[Dict[str, str]]:
-#     """
-#     Generate or update a summary for a single file using the model.
-
-#     Args:
-#         file_path (Path): The path to the file to be summarized.
-#         qa_component (SummaryQA): The component that generates the summary.
-#         existing_summaries (List[Dict[str, str]]): A list of existing summaries to update.
-
-#     Returns:
-#         List[Dict[str, str]]: The updated list of summaries including the new or updated summary for the file.
-#     """
-#     file_name = file_path.name
-#     updated = False
-
-#     # Check if the file summary already exists in the existing_summaries list
-#     for summary in existing_summaries:
-#         if summary["file"] == file_name:
-#             updated = True  # Mark as updated if the summary already exists
-#             break
-
-#     # If no summary exists for the file, add a new entry with an empty description
-#     if not updated:
-#         existing_summaries.append({"file": file_name, "description": ""})
-
-#     try:
-#         # Read the content of the file
-#         with open(file_path, "r") as f:
-#             file_content = f.read()
-
-#         # Generate a summary for the file content using the qa_component
-#         summary_text = qa_component.call(file_content)
-
-#         # Update the description in the existing_summaries list
-#         for summary in existing_summaries:
-#             if summary["file"] == file_name:
-#                 summary["description"] = summary_text
-#                 break
-#     except Exception as e:
-#         # Handle exceptions and update the summary with an error message
-#         for summary in existing_summaries:
-#             if summary["file"] == file_name:
-#                 summary["description"] = f"Error processing file {file_path}: {str(e)}"
-#                 break
-
-#     return existing_summaries
+    yield f"data: {json.dumps({'final_summary': summary})}\n\n"
 
 
-# if blank_error_summary:
-#     # Initialize an empty list to store the summaries
-#     summaries = []
+def summary_generation_handler_stream():
+    repository_url = request.args.get("repository_url")
+    redo = request.args.get("redo", "false").lower() == "true"
+    if not repository_url:
+        return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
-#     # Prompt the user for a file path
-#     user_input = input("Please enter the path to the file you want to summarize: ")
-#     file_path = Path(user_input)
+    @stream_with_context
+    def generate_and_stream_summary():
+        if not global_variables.global_metadata:
+            github_metadata_endpoint_handler()
+            yield "event: status\ndata: Retrieved GitHub metadata\n\n"
 
-#     if file_path.is_file():
-#         # Generate or update the summary for the specified file
-#         summaries = generate_summary_for_file(file_path, summary_qa, summaries)
+        if not global_variables.global_cloned_repo_path:
+            clone_repo_endpoint_handler()
+            yield "event: status\ndata: Repository cloned\n\n"
 
-#         # Print the summary using PrettyTable
-#         table_summary = PrettyTable()
-#         table_summary.field_names = ["File", "Description"]
+        excel_path = f"output/{global_variables.global_metadata.name}_summary.xlsx"
 
-#         # Add each summary to the PrettyTable
-#         for summary in summaries:
-#             table_summary.add_row([summary["file"], summary["description"]])
+        if redo or not os.path.exists(excel_path):
+            if global_variables.global_cloned_repo_path:
+                path = Path(global_variables.global_cloned_repo_path)
+                if not path.is_dir():
+                    yield f"event: error\ndata: The path {path} is not a directory.\n\n"
+                    return
 
-#         print(table_summary)
-#     else:
-#         # If the path is not a valid file, print an error message
-#         print(f"The path {file_path} is not a valid file.")
+                yield "event: status\ndata: Generating summary...\n\n"
 
-# %% [markdown]
-# <!-- @format -->
-#
-# #### Combine Summaries
-#
-# This section combines all generated summaries into a single summary string, filtering out unnecessary or erroneous data.
-#
+                # Ensure this line is uncommented
+                for summary_event in generate_summary_stream(
+                    path,
+                    ignore_list=ignore_list_folder_structure,
+                    summary_component=summary_qa,
+                    ignore_extensions=ignore_list_extensions,
+                ):
+                    yield summary_event
+                summary = global_variables.global_combined_summary
+                table_summary = PrettyTable()
+                table_summary.field_names = ["File", "Description"]
 
-# # %%
-# if summary:
-#     # Combine summaries, ignoring "Not a File" or error messages
-#     combined_summary = " ".join(
-#         [
-#             get_description_data(item["description"])
-#             for item in summary
-#             if get_description_data(item["description"])
-#             and get_description_data(item["description"]) != "Not a File"
-#             and get_description_data(item["description"]) != "."
-#             and not get_description_data(item["description"]).startswith(
-#                 "HTTP error 401"
-#             )
-#         ]
-#     )
-#     print(combined_summary)
+                for item in summary:
+                    table_summary.add_row([item["file"], item["description"]])
+
+                save_summary_to_excel_and_print_table(
+                    summary,
+                    global_variables.global_cloned_repo_path,
+                    excel_path=excel_path,
+                )
+
+                if summary:
+                    combined_summary = " ".join(
+                        [
+                            get_description_data(item["description"])
+                            for item in summary
+                            if get_description_data(item["description"])
+                            and get_description_data(item["description"])
+                            != "Not a File"
+                            and get_description_data(item["description"]) != "."
+                            and not get_description_data(
+                                item["description"]
+                            ).startswith("HTTP error 401")
+                        ]
+                    )
+                    global_variables.global_combined_summary = combined_summary
+                    yield f"event: combined_summary\ndata: {combined_summary}\n\n"
+                else:
+                    yield "event: error\ndata: Summary generation failed.\n\n"
+            else:
+                yield "event: error\ndata: Repository cloning failed or was skipped.\n\n"
+        else:
+            try:
+                summary_df = pd.read_excel(excel_path, engine="openpyxl")
+                summary_data = summary_df.to_dict(orient="records")
+
+                table_summary = PrettyTable()
+                table_summary.field_names = ["File", "Description"]
+
+                for item in summary_data:
+                    table_summary.add_row([item["File"], item["Description"]])
+
+                combined_summary = " ".join(
+                    [
+                        get_description_data(item["Description"])
+                        for item in summary_data
+                        if get_description_data(item["Description"])
+                        and get_description_data(item["Description"]) != "Not a File"
+                        and get_description_data(item["Description"]) != "."
+                        and not get_description_data(item["Description"]).startswith(
+                            "HTTP error 401"
+                        )
+                    ]
+                )
+                global_variables.global_combined_summary = combined_summary
+                yield f"event: combined_summary\ndata: {combined_summary}\n\n"
+            except Exception as e:
+                yield f"event: error\ndata: Failed to load or process Excel file: {str(e)}\n\n"
+
+    return Response(generate_and_stream_summary(), content_type="text/event-stream")
+
+
+# TODO: Retry Summarization for Errors
