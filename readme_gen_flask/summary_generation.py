@@ -193,12 +193,15 @@ def summary_generation_handler():
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
     if not global_variables.global_metadata:
+        print("No global metadata found. Retrieving metadata.....")
         github_metadata_endpoint_handler()
 
     if not global_variables.global_cloned_repo_path:
+        print("No clone folder found. Cloning Folder.....")
         clone_repo_endpoint_handler()
 
     excel_path = f"output/{global_variables.global_metadata.name}_summary.xlsx"
+    # excel_path = f"output/Daraz_Scraper_summary.xlsx"
 
     if redo or not os.path.exists(excel_path):
         if global_variables.global_cloned_repo_path:
@@ -241,8 +244,20 @@ def summary_generation_handler():
                         )
                     ]
                 )
+                summary_dict = {
+                    item["file"]: item["description"]
+                    for item in summary
+                    if get_description_data(item["description"])
+                    and get_description_data(item["description"]) != "Not a File"
+                    and get_description_data(item["description"]) != "."
+                    and not get_description_data(item["description"]).startswith(
+                        "HTTP error 401"
+                    )
+                }
+                #
                 global_variables.global_combined_summary = combined_summary
-                return combined_summary
+                global_variables.global_summary_dict = summary_dict
+                return summary_dict
             else:
                 return jsonify({"error": "Summary generation failed."}), 500
         else:
@@ -274,8 +289,20 @@ def summary_generation_handler():
                     )
                 ]
             )
+            summary_dict = {
+                item["File"]: item["Description"]
+                for item in summary_data
+                if get_description_data(item["Description"])
+                and get_description_data(item["Description"]) != "Not a File"
+                and get_description_data(item["Description"]) != "."
+                and not get_description_data(item["Description"]).startswith(
+                    "HTTP error 401"
+                )
+            }
+
             global_variables.global_combined_summary = combined_summary
-            return combined_summary
+            global_variables.global_summary_dict = summary_dict
+            return summary_dict
         except Exception as e:
             return (
                 jsonify({"error": f"Failed to load or process Excel file: {str(e)}"}),
@@ -285,9 +312,17 @@ def summary_generation_handler():
 
 def summary_generation():
     try:
-        combined_summary = summary_generation_handler()
-        return jsonify({"combined_summary": combined_summary}), 200
+        # Call the handler function
+        result = summary_generation_handler()
+
+        # Check if result is an instance of Response
+        if isinstance(result, Response):
+            return result  # Return the Response object directly
+
+        # If result is not a Response, jsonify it
+        return jsonify(result), 200
     except Exception as e:
+        # Handle unexpected exceptions
         return jsonify({"error": str(e)}), 500
 
 
@@ -300,12 +335,13 @@ def file_summary_generation():
         return jsonify({"error": "Missing 'file_path' parameter"}), 400
 
     if not global_variables.global_metadata:
+        print("No global metadata found. Retrieving metadata.....")
         github_metadata_endpoint_handler()
 
     excel_path = Path(
         f"output/{global_variables.global_metadata.name}_api_reference_data.xlsx"
     )
-    print("I am Here")
+    # excel_path = f"output/Daraz_Scraper_summary.xlsx"
 
     file_path = Path(file_path)
     excel_path = Path(excel_path)
@@ -316,15 +352,11 @@ def file_summary_generation():
 
     # Initialize SummaryQA component
     summary_qa = SummaryQA(**model)
-    print("I am Here1")
     try:
-        print("I am Here1.1")
         # Extract HTTPS requests using SummaryQA
         with open(file_path, "r") as f:
             file_content = f.read()
-        print(file_content)
         summary_text = summary_qa.call(file_content)
-        print("I am Here1.5")
         # Check if the Excel file exists
         if excel_path.exists():
             # Load existing data
@@ -334,10 +366,9 @@ def file_summary_generation():
             # Check if the file path already exists
             updated = False
             for entry in existing_data:
-                print("I am Here2")
                 if entry.get("File") == str(file_path):
                     # Update existing entry
-                    entry["Description"] = summary_text
+                    entry["Description"] = get_description_data(summary_text)
                     updated = True
                     break
 
@@ -345,7 +376,10 @@ def file_summary_generation():
                 print("I am Here3")
                 # Add new entry if file path does not exist
                 existing_data.append(
-                    {"File": str(file_path), "Description": summary_text}
+                    {
+                        "File": str(file_path),
+                        "Description": get_description_data(summary_text),
+                    }
                 )
 
             # Save the updated data to Excel
@@ -355,13 +389,21 @@ def file_summary_generation():
                 {
                     "message": "Excel file updated with HTTPS request data.",
                     "updated_file": str(file_path),
-                    "new_data": {"File": str(file_path), "Description": summary_text},
+                    "new_data": {
+                        "File": str(file_path),
+                        "Description": get_description_data(summary_text),
+                    },
                 }
             )
         else:
-            print("I am Here4")
+
             # Create a new Excel file with the data
-            new_data = [{"File": str(file_path), "Description": summary_text}]
+            new_data = [
+                {
+                    "File": str(file_path),
+                    "Description": get_description_data(summary_text),
+                }
+            ]
             df_new_data = pd.DataFrame(new_data)
             df_new_data.to_excel(excel_path, index=False, engine="openpyxl")
             return jsonify(
@@ -382,6 +424,7 @@ def stream_data():
             return
 
         if not global_variables.global_metadata:
+            print("No global metadata found. Retrieving metadata.....")
             github_metadata_endpoint_handler()
 
             if not global_variables.global_metadata:
@@ -392,6 +435,7 @@ def stream_data():
             time.sleep(1)
 
         if not global_variables.global_cloned_repo_path:
+            print("No clone folder found. Cloning Folder.....")
             clone_repo_endpoint_handler()
 
             if not global_variables.global_cloned_repo_path:
@@ -549,10 +593,12 @@ def summary_generation_handler_stream():
     @stream_with_context
     def generate_and_stream_summary():
         if not global_variables.global_metadata:
+            print("No global metadata found. Retrieving metadata.....")
             github_metadata_endpoint_handler()
             yield "event: status\ndata: Retrieved GitHub metadata\n\n"
 
         if not global_variables.global_cloned_repo_path:
+            print("No clone folder found. Cloning Folder.....")
             clone_repo_endpoint_handler()
             yield "event: status\ndata: Repository cloned\n\n"
 

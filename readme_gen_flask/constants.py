@@ -236,13 +236,15 @@ project_icons = {
         "icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/clapperboard.png"
     },
     "food_delivery": {
-        "icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/food-delivery.png"
+        "icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/gingerbread-house.png"
     },
     "finance": {"icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/money.png"},
     "transportation": {
         "icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/bus.png"
     },
-    "hospitality": {"icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/hotel.png"},
+    "hospitality": {
+        "icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/service-bell    .png"
+    },
     "music": {
         "icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/musical-notes.png"
     },

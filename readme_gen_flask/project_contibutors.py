@@ -36,6 +36,7 @@ def project_contributors():
         return jsonify({"error": "Repository link is required."}), 400
 
     if not global_variables.global_metadata:
+        print("No global metadata found. Retrieving metadata.....")
         github_metadata_endpoint_handler()
 
     try:

@@ -59,9 +59,11 @@ def get_project_languages():
         global_variables.global_metadata = None
 
     if not global_variables.global_metadata:
+        print("No global metadata found. Retrieving metadata.....")
         github_metadata_endpoint_handler()
 
     if not global_variables.global_cloned_repo_path:
+        print("No clone folder found. Cloning Folder.....")
         clone_repo_endpoint_handler()
 
     # Step 1: Identify languages, frameworks, and tools

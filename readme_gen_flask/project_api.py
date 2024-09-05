@@ -168,6 +168,7 @@ def update_https_requests_endpoint():
         return jsonify({"error": "Missing 'file_path' parameter"}), 400
 
     if not global_variables.global_metadata:
+        print("No global metadata found. Retrieving metadata.....")
         github_metadata_endpoint_handler()
 
     excel_path = Path(
@@ -247,9 +248,11 @@ def get_api_references():
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
     if not global_variables.global_metadata:
+        print("No global metadata found. Retrieving metadata.....")
         github_metadata_endpoint_handler()
 
     if not global_variables.global_cloned_repo_path:
+        print("No clone folder found. Cloning Folder.....")
         clone_repo_endpoint_handler()
 
     excel_path = Path(

@@ -91,6 +91,7 @@ def folder_structure_endpoint_handler():
     folder_structure_markdown = None
 
     if not global_variables.global_cloned_repo_path:
+        print("No clone folder found. Cloning Folder.....")
         clone_repo_endpoint_handler()
 
     if global_variables.global_cloned_repo_path:
@@ -171,6 +172,7 @@ def folder_structure_dict_endpoint():
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
     if not global_variables.global_cloned_repo_path:
+        print("No clone folder found. Cloning Folder.....")
         clone_repo_endpoint_handler()
 
     if global_variables.global_cloned_repo_path:
