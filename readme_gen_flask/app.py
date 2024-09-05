@@ -13,7 +13,7 @@ from folder_structure import folder_structure_endpoint, folder_structure_dict_en
 from ollam_check import ask_question
 from summary_generation import (
     summary_generation,
-    stream_data,
+    file_summary_generation,
     summary_generation_handler_stream,
 )
 from project_image import get_project_icon
@@ -67,9 +67,14 @@ def summary_generation_endpoint_main():
     return summary_generation()
 
 
-# @app.route("/summary_generation", methods=["GET"])
-# def summary_generation():
-#     return stream_data()
+@app.route("/summary_generation_stream", methods=["GET"])
+def summary_generation_handler_endpoint():
+    return summary_generation_handler_stream()
+
+
+@app.route("/file_summary_generation", methods=["GET"])
+def file_summary_generation_endpoint_main():
+    return file_summary_generation()
 
 
 @app.route("/project_icon", methods=["GET"])
@@ -161,11 +166,6 @@ def generate_progress():
 @app.route("/progress")
 def progress():
     return Response(generate_progress(), content_type="text/event-stream")
-
-
-@app.route("/summary_generation_stream", methods=["GET"])
-def summary_generation_handler_endpoint():
-    return summary_generation_handler_stream()
 
 
 if __name__ == "__main__":

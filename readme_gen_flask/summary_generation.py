@@ -4,7 +4,8 @@ from lightrag.core.component import Component
 from lightrag.components.model_client import OllamaClient
 import os
 from pathlib import Path
-from typing import List, Dict, Generator
+from typing import List, Dict
+import typing
 from prettytable import PrettyTable
 from tqdm import tqdm
 from github_metadata import github_metadata_endpoint_handler
@@ -290,6 +291,89 @@ def summary_generation():
         return jsonify({"error": str(e)}), 500
 
 
+def file_summary_generation():
+    repository_url = request.args.get("repository_url")
+    file_path = request.args.get("file_path")
+    if not repository_url:
+        return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+    if not file_path:
+        return jsonify({"error": "Missing 'file_path' parameter"}), 400
+
+    if not global_variables.global_metadata:
+        github_metadata_endpoint_handler()
+
+    excel_path = Path(
+        f"output/{global_variables.global_metadata.name}_api_reference_data.xlsx"
+    )
+    print("I am Here")
+
+    file_path = Path(file_path)
+    excel_path = Path(excel_path)
+
+    # Check if the file exists
+    if not file_path.is_file():
+        return jsonify({"error": f"The file {file_path} does not exist."}), 400
+
+    # Initialize SummaryQA component
+    summary_qa = SummaryQA(**model)
+    print("I am Here1")
+    try:
+        print("I am Here1.1")
+        # Extract HTTPS requests using SummaryQA
+        with open(file_path, "r") as f:
+            file_content = f.read()
+        print(file_content)
+        summary_text = summary_qa.call(file_content)
+        print("I am Here1.5")
+        # Check if the Excel file exists
+        if excel_path.exists():
+            # Load existing data
+            df_summary_data = pd.read_excel(excel_path, engine="openpyxl")
+            existing_data = df_summary_data.to_dict(orient="records")
+
+            # Check if the file path already exists
+            updated = False
+            for entry in existing_data:
+                print("I am Here2")
+                if entry.get("File") == str(file_path):
+                    # Update existing entry
+                    entry["Description"] = summary_text
+                    updated = True
+                    break
+
+            if not updated:
+                print("I am Here3")
+                # Add new entry if file path does not exist
+                existing_data.append(
+                    {"File": str(file_path), "Description": summary_text}
+                )
+
+            # Save the updated data to Excel
+            df_updated_data = pd.DataFrame(existing_data)
+            df_updated_data.to_excel(excel_path, index=False, engine="openpyxl")
+            return jsonify(
+                {
+                    "message": "Excel file updated with HTTPS request data.",
+                    "updated_file": str(file_path),
+                    "new_data": {"File": str(file_path), "Description": summary_text},
+                }
+            )
+        else:
+            print("I am Here4")
+            # Create a new Excel file with the data
+            new_data = [{"File": str(file_path), "Description": summary_text}]
+            df_new_data = pd.DataFrame(new_data)
+            df_new_data.to_excel(excel_path, index=False, engine="openpyxl")
+            return jsonify(
+                {
+                    "message": "New Excel file created and data added.",
+                    "created_file": str(excel_path),
+                }
+            )
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
+
+
 def stream_data():
     def generate():
         repository_url = request.args.get("repository_url")
@@ -379,7 +463,7 @@ def generate_summary_stream(
     ignore_list: List[str],
     summary_component: SummaryQA,
     ignore_extensions: List[str],
-) -> Generator[Dict[str, str], None, None]:
+) -> typing.Generator[Dict[str, str], None, None]:
 
     summary = []
     files_to_process = []

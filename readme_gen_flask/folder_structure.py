@@ -91,15 +91,7 @@ def folder_structure_endpoint_handler():
     folder_structure_markdown = None
 
     if not global_variables.global_cloned_repo_path:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
-        async def main():
-            async with aiohttp.ClientSession() as session:
-                return await clone_github_repo(repository_url)
-
-        cloned_repo_path = loop.run_until_complete(main())
-        global_variables.global_cloned_repo_path = cloned_repo_path
+        clone_repo_endpoint_handler()
 
     if global_variables.global_cloned_repo_path:
         # Print the folder structure
