@@ -133,7 +133,7 @@ def project_installation_guide():
         # Generate the installation guide using the provided summaries and folder structure
         installation_guide = generate_installation_guide(
             global_variables.global_combined_summary,
-            global_variables.folder_structure_str,
+            global_variables.global_folder_structure_str,
             repository_url,
             installation_component=installation_qa,
         )

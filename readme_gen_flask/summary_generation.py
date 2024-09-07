@@ -373,7 +373,6 @@ def file_summary_generation():
                     break
 
             if not updated:
-                print("I am Here3")
                 # Add new entry if file path does not exist
                 existing_data.append(
                     {

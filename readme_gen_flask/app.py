@@ -3,6 +3,7 @@ import threading
 import time
 from flask import Flask, Response, request
 from tqdm import tqdm
+from project_installation_guide import project_installation_guide
 from utils.llama_configurations import ollama
 from flask_cors import CORS  # Import CORS
 import json
@@ -105,6 +106,11 @@ def project_overview_endpoint_main():
 @app.route("/project_key_feature", methods=["GET"])
 def project_key_feature_endpoint_main():
     return project_key_feature()
+
+
+@app.route("/project_installation_guide", methods=["GET"])
+def project_installation_guide_endpoint_main():
+    return project_installation_guide()
 
 
 @app.route("/api_references", methods=["GET"])
