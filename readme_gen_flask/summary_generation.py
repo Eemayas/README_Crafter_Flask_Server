@@ -17,6 +17,7 @@ from prettytable import PrettyTable
 from flask import jsonify, request, Response, stream_with_context
 import global_variables
 import time
+from utils.check_new_repo_request import check_new_repo_requent
 
 summary_template = r"""<SYS>
 You are a summarization assistant specialized in coding files.
@@ -331,6 +332,9 @@ def file_summary_generation():
     file_path = request.args.get("file_path")
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+
+    check_new_repo_requent(repository_url=repository_url)
+
     if not file_path:
         return jsonify({"error": "Missing 'file_path' parameter"}), 400
 
@@ -338,9 +342,7 @@ def file_summary_generation():
         print("No global metadata found. Retrieving metadata.....")
         github_metadata_endpoint_handler()
 
-    excel_path = Path(
-        f"output/{global_variables.global_metadata.name}_api_reference_data.xlsx"
-    )
+    excel_path = Path(f"output/{global_variables.global_metadata.name}_summary.xlsx")
     # excel_path = f"output/Daraz_Scraper_summary.xlsx"
 
     file_path = Path(file_path)

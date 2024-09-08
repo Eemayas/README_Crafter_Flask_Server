@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import re
+from utils.check_new_repo_request import check_new_repo_requent
 
 app = Flask(__name__)
 
@@ -74,6 +75,7 @@ def contributing_guide():
     if not repository_url:
         return jsonify({"error": "Repository link is required."}), 400
 
+    check_new_repo_requent(repository_url=repository_url)
     try:
         # Generate the contributing guide
         guide_markdown = generate_contributing_guide(repository_url)

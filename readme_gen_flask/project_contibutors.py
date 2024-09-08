@@ -1,6 +1,7 @@
 from flask import jsonify, request
 import global_variables
 from github_metadata import github_metadata_endpoint_handler
+from utils.check_new_repo_request import check_new_repo_requent
 
 
 def generate_contributors_table(contributors):
@@ -34,6 +35,8 @@ def project_contributors():
 
     if not repository_url:
         return jsonify({"error": "Repository link is required."}), 400
+    
+    check_new_repo_requent(repository_url=repository_url)
 
     if not global_variables.global_metadata:
         print("No global metadata found. Retrieving metadata.....")

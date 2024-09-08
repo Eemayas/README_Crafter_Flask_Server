@@ -6,6 +6,7 @@ from typing import Optional
 import aiohttp
 from flask import request, jsonify
 import global_variables
+from utils.check_new_repo_request import check_new_repo_requent
 
 
 async def clone_github_repo(
@@ -58,6 +59,8 @@ def clone_repo_endpoint_handler():
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
+    check_new_repo_requent(repository_url)
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
@@ -66,7 +69,7 @@ def clone_repo_endpoint_handler():
 
     cloned_repo_path = loop.run_until_complete(main())
     global_variables.global_cloned_repo_path = cloned_repo_path
-    
+
     return cloned_repo_path
 
 

@@ -5,6 +5,7 @@ from typing import Any, Optional, List
 import nest_asyncio
 from global_types import RepositoryMetadata, Contributor
 import global_variables
+from utils.check_new_repo_request import check_new_repo_requent
 
 # from global_variables import global_metadata
 
@@ -187,6 +188,8 @@ def github_metadata_endpoint_handler():
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
+    check_new_repo_requent(repository_url)
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
@@ -198,7 +201,7 @@ def github_metadata_endpoint_handler():
     metadata = loop.run_until_complete(main())
     global_variables.global_metadata = metadata
     return metadata
-    
+
 
 def github_metadata_endpoint():
     metadata = github_metadata_endpoint_handler()

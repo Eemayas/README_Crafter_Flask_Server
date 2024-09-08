@@ -3,6 +3,7 @@ import global_variables
 from lightrag.core.generator import Generator
 from lightrag.core.component import Component
 from lightrag.components.model_client import OllamaClient
+from utils.check_new_repo_request import check_new_repo_requent
 
 from utils.llama_configurations import get_description_data, model
 from summary_generation import summary_generation_handler
@@ -88,11 +89,14 @@ def generate_project_overview(
     """
     return overview_component.generator.call({"input_str": combined_summary})
 
+
 def project_overview():
     repository_url = request.args.get("repository_url")
 
     if not repository_url:
         return jsonify({"error": "Repository link is required."}), 400
+
+    check_new_repo_requent(repository_url=repository_url)
 
     if not global_variables.global_combined_summary:
         summary_generation_handler()

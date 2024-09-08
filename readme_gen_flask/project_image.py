@@ -1,6 +1,7 @@
 from flask import jsonify, request
 from constants import project_icons
 import global_variables
+from utils.check_new_repo_request import check_new_repo_requent
 
 
 def get_project_icon():

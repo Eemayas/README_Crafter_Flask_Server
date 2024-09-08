@@ -6,7 +6,8 @@ import aiohttp
 from typing import List
 from constants import ignore_list_folder_structure
 from clone_github import clone_repo_endpoint_handler
-
+from utils.check_new_repo_request import check_new_repo_requent
+from utils.check_new_repo_request import check_new_repo_requent
 import global_variables
 
 
@@ -87,6 +88,8 @@ def folder_structure_endpoint_handler():
     repository_url = request.args.get("repository_url")
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+
+    check_new_repo_requent(repository_url=repository_url)
 
     folder_structure_markdown = None
 
@@ -170,6 +173,8 @@ def folder_structure_dict_endpoint():
     repository_url = request.args.get("repository_url")
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+
+    check_new_repo_requent(repository_url=repository_url)
 
     if not global_variables.global_cloned_repo_path:
         print("No clone folder found. Cloning Folder.....")

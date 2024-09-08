@@ -11,9 +11,10 @@ from utils.llama_configurations import get_description_data, model
 from constants import ignore_list_folder_structure, specific_ignores_api
 import pandas as pd
 from prettytable import PrettyTable
-from flask import Flask, jsonify, request
+from flask import jsonify, request
 import global_variables
 from constants import api_ignore_extensions
+from utils.check_new_repo_request import check_new_repo_requent
 
 
 # Define the template for API reference extraction
@@ -164,6 +165,9 @@ def update_https_requests_endpoint():
     file_path = request.args.get("file_path")
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+
+    check_new_repo_requent(repository_url=repository_url)
+
     if not file_path:
         return jsonify({"error": "Missing 'file_path' parameter"}), 400
 
@@ -246,6 +250,8 @@ def get_api_references():
     redo = request.args.get("redo", "false").lower() == "true"
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+
+    check_new_repo_requent(repository_url=repository_url)
 
     if not global_variables.global_metadata:
         print("No global metadata found. Retrieving metadata.....")
