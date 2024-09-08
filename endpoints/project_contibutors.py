@@ -1,6 +1,6 @@
 from flask import jsonify, request
 import global_variables
-from github_metadata import github_metadata_endpoint_handler
+from endpoints.github_metadata import github_metadata_endpoint_handler
 from utils.check_new_repo_request import check_new_repo_requent
 
 

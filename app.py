@@ -3,31 +3,30 @@ import threading
 import time
 from flask import Flask, Response, request
 from tqdm import tqdm
-from project_installation_guide import project_installation_guide
 from utils.llama_configurations import ollama
 from flask_cors import CORS  # Import CORS
 import json
 
-from github_metadata import github_metadata_endpoint
-from readme_gen_flask.endpoints.clone_github import clone_repo_endpoint
-from readme_gen_flask.endpoints.folder_structure import folder_structure_endpoint, folder_structure_dict_endpoint
-from ollam_check import ask_question
-from summary_generation import (
+from endpoints.github_metadata import github_metadata_endpoint
+from endpoints.clone_github import clone_repo_endpoint
+from endpoints.folder_structure import folder_structure_endpoint, folder_structure_dict_endpoint
+from endpoints.ollam_check import ask_question
+from endpoints.project_installation_guide import project_installation_guide
+from endpoints.project_image import get_project_icon
+from endpoints.project_name import get_project_name
+from endpoints.project_badge import get_project_badges
+from endpoints.project_languages import get_project_languages
+from endpoints.project_overview import project_overview
+from endpoints.project_key_feature import project_key_feature
+from endpoints.project_api import get_api_references, update_https_requests_endpoint
+from endpoints.project_contibuting import contributing_guide
+from endpoints.project_contibutors import project_contributors
+from endpoints.project_license import project_license
+from endpoints.summary_generation import (
     summary_generation,
     file_summary_generation,
     summary_generation_handler_stream,
 )
-from project_image import get_project_icon
-from project_name import get_project_name
-from project_badge import get_project_badges
-from project_languages import get_project_languages
-from project_overview import project_overview
-from project_key_feature import project_key_feature
-from project_api import get_api_references, update_https_requests_endpoint
-from project_contibuting import contributing_guide
-from project_contibutors import project_contributors
-from project_license import project_license
-
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes

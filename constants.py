@@ -209,9 +209,6 @@ specific_ignores_api = [".gitignore", ".config.js", ".config.ts"]
 # ### Project Icons
 #
 # This section defines the map of the project type and project icons
-
-
-# %%
 project_icons = {
     "ecommerce": {
         "icon": "https://img.icons8.com/nolan/512/1A6DFF/C822FF/shopping-basket-2.png"

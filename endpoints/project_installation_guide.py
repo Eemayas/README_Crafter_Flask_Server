@@ -5,7 +5,7 @@ from lightrag.core.component import Component
 from lightrag.components.model_client import OllamaClient
 from endpoints.folder_structure import folder_structure_endpoint_handler
 from utils.llama_configurations import get_description_data, model
-from summary_generation import summary_generation_handler
+from endpoints.summary_generation import summary_generation_handler
 from utils.check_new_repo_request import check_new_repo_requent
 
 

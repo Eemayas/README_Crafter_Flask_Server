@@ -6,7 +6,7 @@ from lightrag.components.model_client import OllamaClient
 from utils.check_new_repo_request import check_new_repo_requent
 
 from utils.llama_configurations import get_description_data, model
-from summary_generation import summary_generation_handler
+from endpoints.summary_generation import summary_generation_handler
 
 # Define the template for generating a project overview
 project_overview_template = r"""<SYS>

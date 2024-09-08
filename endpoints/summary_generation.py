@@ -8,7 +8,7 @@ from typing import List, Dict
 import typing
 from prettytable import PrettyTable
 from tqdm import tqdm
-from github_metadata import github_metadata_endpoint_handler
+from endpoints.github_metadata import github_metadata_endpoint_handler
 from endpoints.clone_github import clone_repo_endpoint_handler
 from utils.llama_configurations import model, get_description_data
 from constants import ignore_list_folder_structure, ignore_list_extensions
