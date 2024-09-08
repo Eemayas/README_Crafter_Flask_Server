@@ -3,7 +3,6 @@ import shutil
 import subprocess
 import asyncio
 from typing import Optional
-import aiohttp
 from flask import request, jsonify
 import global_variables
 from utils.check_new_repo_request import check_new_repo_requent

@@ -9,8 +9,8 @@ from flask_cors import CORS  # Import CORS
 import json
 
 from github_metadata import github_metadata_endpoint
-from clone_github import clone_repo_endpoint
-from folder_structure import folder_structure_endpoint, folder_structure_dict_endpoint
+from readme_gen_flask.endpoints.clone_github import clone_repo_endpoint
+from readme_gen_flask.endpoints.folder_structure import folder_structure_endpoint, folder_structure_dict_endpoint
 from ollam_check import ask_question
 from summary_generation import (
     summary_generation,

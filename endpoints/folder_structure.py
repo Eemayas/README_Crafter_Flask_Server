@@ -1,11 +1,9 @@
 from pathlib import Path
 from typing import List
 from flask import jsonify, request
-import asyncio
-import aiohttp
 from typing import List
 from constants import ignore_list_folder_structure
-from clone_github import clone_repo_endpoint_handler
+from endpoints.clone_github import clone_repo_endpoint_handler
 from utils.check_new_repo_request import check_new_repo_requent
 from utils.check_new_repo_request import check_new_repo_requent
 import global_variables
