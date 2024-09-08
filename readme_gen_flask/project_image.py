@@ -1,9 +1,18 @@
 from flask import jsonify, request
 from constants import project_icons
+import global_variables
 
 
 def get_project_icon():
     choice = request.args.get("choice")
+
+    if (
+        global_variables.global_project_image_choice == choice
+        and global_variables.global_project_image_markdown
+    ):
+        return jsonify(
+            {"project_image_markdown": global_variables.global_project_image_markdown}
+        )
 
     if choice and choice.isdigit():  # Check if the input is a digit
         choice = int(choice)
@@ -37,7 +46,8 @@ def get_project_icon():
         else:
             # Set an empty Markdown string if no icon is selected
             project_image_markdown = ""
-
+        global_variables.global_project_image_choice = choice
+        global_variables.global_project_image_markdown = project_image_markdown
         # Return the Markdown content as JSON
         return jsonify({"project_image_markdown": project_image_markdown})
 

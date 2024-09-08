@@ -6,6 +6,7 @@ from constants import extensions, frameworks_extensions, tools_extensions
 import global_variables
 from github_metadata import github_metadata_endpoint_handler
 from clone_github import clone_repo_endpoint_handler
+from utils.check_new_repo_request import check_new_repo_requent
 
 
 # Global variables to store detected languages, frameworks, and tools
@@ -47,16 +48,16 @@ def generate_language_badges(urls_map):
     return html_template
 
 
-# @app.route("/project_info", methods=["GET"])
 def get_project_languages():
     repository_url = request.args.get("repository_url")
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
     shields_data_file = "./shieldsio_icons.json"
 
-    if repository_url != global_variables.global_repository_url:
-        global_variables.global_cloned_repo_path = None
-        global_variables.global_metadata = None
+    check_new_repo_requent(repository_url=repository_url)
+
+    if global_variables.global_project_languages:
+        return jsonify({"badges_html": global_variables.global_project_languages}), 200
 
     if not global_variables.global_metadata:
         print("No global metadata found. Retrieving metadata.....")
@@ -129,5 +130,5 @@ def get_project_languages():
 </p>
 {generate_language_badges(badges_urls_map)}
 """
-
+    global_variables.global_project_languages = language_badges_markdown
     return jsonify({"badges_html": language_badges_markdown}), 200

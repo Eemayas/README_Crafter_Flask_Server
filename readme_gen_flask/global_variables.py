@@ -1,7 +1,12 @@
+global_repository_url = None
 global_metadata = None
-global_folder_structure = None
 global_cloned_repo_path = None
+global_folder_structure = None
+global_folder_structure_str = None
 global_combined_summary = None
 global_summary_dict = None
-global_repository_url = None
-global_folder_structure_str = None
+global_project_image_choice = None
+global_project_image_markdown = None
+global_project_name = None
+global_project_badges = None
+global_project_languages = None

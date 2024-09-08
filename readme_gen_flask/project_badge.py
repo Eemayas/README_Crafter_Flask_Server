@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify
-
-app = Flask(__name__)
+import global_variables
 
 
 def update_github_badge_urls(repository_url, badges):
@@ -65,7 +64,6 @@ def update_github_badge_urls(repository_url, badges):
 def get_project_badges():
     repository_url = request.args.get("repository_url")
     badges = request.args.getlist("badges")
-    print(badges)
 
     if not repository_url or not badges:
         return (
@@ -73,5 +71,9 @@ def get_project_badges():
             400,
         )
 
+    if global_variables.global_project_badges:
+        return jsonify({"badges_html": global_variables.global_project_badges}), 200
+
     badges_html = update_github_badge_urls(repository_url, badges)
+    global_variables.global_project_badges = badges_html
     return jsonify({"badges_html": badges_html}), 200

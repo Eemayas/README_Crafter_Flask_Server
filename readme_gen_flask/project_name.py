@@ -9,6 +9,11 @@ def get_project_name():
         if not repository_url:
             return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
+        if global_variables.global_project_name:
+            return jsonify(
+                {"project_name_markdown": global_variables.global_project_name}
+            )
+
         if not global_variables.global_metadata:
             print("No global metadata found. Retrieving metadata.....")
             github_metadata_endpoint_handler()
@@ -18,6 +23,7 @@ def get_project_name():
     <h1 align="center">{global_variables.global_metadata.name}</h1>
 </p>
             """
+        global_variables.global_project_name = project_name_markdown
         return jsonify({"project_name_markdown": project_name_markdown}), 200
 
     except Exception as e:
