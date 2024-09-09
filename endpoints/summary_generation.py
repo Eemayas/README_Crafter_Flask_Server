@@ -10,6 +10,7 @@ from prettytable import PrettyTable
 from tqdm import tqdm
 from endpoints.github_metadata import github_metadata_endpoint_handler
 from endpoints.clone_github import clone_repo_endpoint_handler
+from utils.handle_metadata_and_clone import handle_metadata_and_clone
 from utils.llama_configurations import model, get_description_data
 from constants import ignore_list_folder_structure, ignore_list_extensions
 import pandas as pd
@@ -193,13 +194,7 @@ def summary_generation_handler():
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
-    if not global_variables.global_metadata:
-        print("No global metadata found. Retrieving metadata.....")
-        github_metadata_endpoint_handler()
-
-    if not global_variables.global_cloned_repo_path:
-        print("No clone folder found. Cloning Folder.....")
-        clone_repo_endpoint_handler()
+    handle_metadata_and_clone(function_name="summary_generation_handler")
 
     excel_path = f"output/{global_variables.global_metadata.name}_summary.xlsx"
     # excel_path = f"output/Daraz_Scraper_summary.xlsx"
@@ -338,9 +333,7 @@ def file_summary_generation():
     if not file_path:
         return jsonify({"error": "Missing 'file_path' parameter"}), 400
 
-    if not global_variables.global_metadata:
-        print("No global metadata found. Retrieving metadata.....")
-        github_metadata_endpoint_handler()
+    handle_metadata_and_clone(function_name="file_summary_generation")
 
     excel_path = Path(f"output/{global_variables.global_metadata.name}_summary.xlsx")
     # excel_path = f"output/Daraz_Scraper_summary.xlsx"

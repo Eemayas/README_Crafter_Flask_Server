@@ -7,6 +7,7 @@ from prettytable import PrettyTable
 from tqdm import tqdm
 from endpoints.github_metadata import github_metadata_endpoint_handler
 from endpoints.clone_github import clone_repo_endpoint_handler
+from utils import handle_metadata_and_clone
 from utils.llama_configurations import get_description_data, model
 from constants import ignore_list_folder_structure, specific_ignores_api
 import pandas as pd
@@ -171,9 +172,7 @@ def update_https_requests_endpoint():
     if not file_path:
         return jsonify({"error": "Missing 'file_path' parameter"}), 400
 
-    if not global_variables.global_metadata:
-        print("No global metadata found. Retrieving metadata.....")
-        github_metadata_endpoint_handler()
+    handle_metadata_and_clone(function_name="update_https_requests_endpoint")
 
     excel_path = Path(
         f"output/{global_variables.global_metadata.name}_api_reference_data.xlsx"
@@ -253,13 +252,7 @@ def get_api_references():
 
     check_new_repo_requent(repository_url=repository_url)
 
-    if not global_variables.global_metadata:
-        print("No global metadata found. Retrieving metadata.....")
-        github_metadata_endpoint_handler()
-
-    if not global_variables.global_cloned_repo_path:
-        print("No clone folder found. Cloning Folder.....")
-        clone_repo_endpoint_handler()
+    handle_metadata_and_clone(function_name="get_api_references")
 
     excel_path = Path(
         f"output/{global_variables.global_metadata.name}_api_reference_data.xlsx"

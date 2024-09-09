@@ -57,19 +57,21 @@ def clone_repo_endpoint_handler():
     repository_url = request.args.get("repository_url")
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
+    try:
+        check_new_repo_requent(repository_url)
 
-    check_new_repo_requent(repository_url)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+        async def main():
+            return await clone_github_repo(repository_url)
 
-    async def main():
-        return await clone_github_repo(repository_url)
+        cloned_repo_path = loop.run_until_complete(main())
+        global_variables.global_cloned_repo_path = cloned_repo_path
 
-    cloned_repo_path = loop.run_until_complete(main())
-    global_variables.global_cloned_repo_path = cloned_repo_path
-
-    return cloned_repo_path
+        return cloned_repo_path
+    except Exception as e:
+        return jsonify({"error": "Failed to clone repository", "details": str(e)}), 500
 
 
 def clone_repo_endpoint():
@@ -77,7 +79,7 @@ def clone_repo_endpoint():
 
     if cloned_repo_path:
         return jsonify(
-            {"message": "Repository cloned successfully", "path": cloned_repo_path}
+            {"message": "Repository cloned successfully", "path": cloned_repo_path}, 200
         )
     else:
         return jsonify({"error": "Failed to clone repository"}), 500

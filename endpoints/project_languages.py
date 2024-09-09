@@ -4,8 +4,7 @@ import requests
 import os
 from constants import extensions, frameworks_extensions, tools_extensions
 import global_variables
-from endpoints.github_metadata import github_metadata_endpoint_handler
-from endpoints.clone_github import clone_repo_endpoint_handler
+from utils.handle_metadata_and_clone import handle_metadata_and_clone
 from utils.check_new_repo_request import check_new_repo_requent
 
 
@@ -59,13 +58,7 @@ def get_project_languages():
     if global_variables.global_project_languages:
         return jsonify({"badges_html": global_variables.global_project_languages}), 200
 
-    if not global_variables.global_metadata:
-        print("No global metadata found. Retrieving metadata.....")
-        github_metadata_endpoint_handler()
-
-    if not global_variables.global_cloned_repo_path:
-        print("No clone folder found. Cloning Folder.....")
-        clone_repo_endpoint_handler()
+    handle_metadata_and_clone(function_name="get_project_languages")
 
     # Step 1: Identify languages, frameworks, and tools
     global languages_found, frameworks_found, tools_found

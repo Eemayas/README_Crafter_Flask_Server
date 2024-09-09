@@ -99,6 +99,9 @@ def project_overview():
     check_new_repo_requent(repository_url=repository_url)
 
     if not global_variables.global_combined_summary:
+        print(
+            "project_overview -- Global combined summary is empty. Generating summary..."
+        )
         summary_generation_handler()
 
     # Initialize OverviewQA component with model configuration

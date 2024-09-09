@@ -2,8 +2,6 @@ from flask import Flask, request, jsonify
 import re
 from utils.check_new_repo_request import check_new_repo_requent
 
-app = Flask(__name__)
-
 
 def generate_contributing_guide(repository_url):
     """

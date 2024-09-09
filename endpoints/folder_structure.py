@@ -7,6 +7,7 @@ from endpoints.clone_github import clone_repo_endpoint_handler
 from utils.check_new_repo_request import check_new_repo_requent
 from utils.check_new_repo_request import check_new_repo_requent
 import global_variables
+from utils.handle_metadata_and_clone import handle_metadata_and_clone
 
 
 def print_folder_structure(
@@ -91,9 +92,7 @@ def folder_structure_endpoint_handler():
 
     folder_structure_markdown = None
 
-    if not global_variables.global_cloned_repo_path:
-        print("No clone folder found. Cloning Folder.....")
-        clone_repo_endpoint_handler()
+    handle_metadata_and_clone(function_name="folder_structure_endpoint_handler")
 
     if global_variables.global_cloned_repo_path:
         # Print the folder structure
@@ -174,9 +173,7 @@ def folder_structure_dict_endpoint():
 
     check_new_repo_requent(repository_url=repository_url)
 
-    if not global_variables.global_cloned_repo_path:
-        print("No clone folder found. Cloning Folder.....")
-        clone_repo_endpoint_handler()
+    handle_metadata_and_clone(function_name="folder_structure_dict_endpoint")
 
     if global_variables.global_cloned_repo_path:
         folder_structure = get_folder_structure(

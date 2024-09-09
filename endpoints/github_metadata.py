@@ -188,24 +188,32 @@ def github_metadata_endpoint_handler():
     if not repository_url:
         return jsonify({"error": "Missing 'repository_url' parameter"}), 400
 
-    check_new_repo_requent(repository_url)
+    try:
+        check_new_repo_requent(repository_url)
 
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
 
-    async def main():
-        async with aiohttp.ClientSession() as session:
-            metadata = await fetch_git_repository_metadata(session, repository_url)
-            return metadata
+        async def main():
+            async with aiohttp.ClientSession() as session:
+                metadata = await fetch_git_repository_metadata(session, repository_url)
+                return metadata
 
-    metadata = loop.run_until_complete(main())
-    global_variables.global_metadata = metadata
-    return metadata
+        metadata = loop.run_until_complete(main())
+        global_variables.global_metadata = metadata
+        return metadata
+    except Exception as e:
+        return (
+            jsonify(
+                {"error": "Failed to fetch repository metadata", "details": str(e)}
+            ),
+            500,
+        )
 
 
 def github_metadata_endpoint():
     metadata = github_metadata_endpoint_handler()
     if metadata:
-        return jsonify({"metadata": metadata_to_dict(metadata)})
+        return jsonify({"metadata": metadata_to_dict(metadata)}), 200
     else:
         return jsonify({"error": "Failed to fetch repository metadata"}), 500
