@@ -35,11 +35,11 @@ async def clone_github_repo(
             subprocess.run(["git", "clone", repository_url, target_path], check=True)
             print(f"Repository cloned into {target_path}/")
 
-            # Remove the .git folder to clean up the cloned repository
-            git_folder_path = os.path.join(target_path, ".git")
-            if os.path.exists(git_folder_path):
-                shutil.rmtree(git_folder_path)
-                print(f"Removed .git folder from {target_path}/")
+            # # Remove the .git folder to clean up the cloned repository
+            # git_folder_path = os.path.join(target_path, ".git")
+            # if os.path.exists(git_folder_path):
+            #     shutil.rmtree(git_folder_path)
+            #     print(f"Removed .git folder from {target_path}/")
 
             # Return the path to the cloned repository
             return target_path
