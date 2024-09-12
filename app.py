@@ -192,9 +192,7 @@ if __name__ == "__main__":
         else "\nExecuting on the local device...........\n"
     )
 
-    if not global_variables.global_is_collab:
-        subprocess.run(["ollama", "pull", "llama3.1:8b"], check=True)
-
+    subprocess.run(["ollama", "pull", "llama3.1:8b"], check=True)
     ollama_thread = threading.Thread(target=ollama)
     ollama_thread.start()
 
