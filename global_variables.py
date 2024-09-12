@@ -1,3 +1,4 @@
+global_is_collab = False
 global_repository_url = None
 global_metadata = None
 global_cloned_repo_path = None

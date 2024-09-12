@@ -10,6 +10,7 @@ from prettytable import PrettyTable
 from tqdm import tqdm
 from endpoints.github_metadata import github_metadata_endpoint_handler
 from endpoints.clone_github import clone_repo_endpoint_handler
+from utils import save_dataframe_to_excel
 from utils.handle_metadata_and_clone import handle_metadata_and_clone
 from utils.llama_configurations import model, get_description_data
 from constants import ignore_list_folder_structure, ignore_list_extensions
@@ -179,8 +180,7 @@ def save_summary_to_excel_and_print_table(
         summary_df = pd.DataFrame(summary_data_for_excel)
 
         # Save DataFrame to an Excel file
-        summary_df.to_excel(excel_path, index=False, engine="openpyxl")
-        print(f"Summary saved to {excel_path}")
+        save_dataframe_to_excel(data=summary_df, excel_path=excel_path)
     else:
         print("No summary data available to save or print.")
 
@@ -378,7 +378,7 @@ def file_summary_generation():
 
             # Save the updated data to Excel
             df_updated_data = pd.DataFrame(existing_data)
-            df_updated_data.to_excel(excel_path, index=False, engine="openpyxl")
+            save_dataframe_to_excel(data=df_updated_data, excel_path=excel_path)
             return jsonify(
                 {
                     "message": "Excel file updated with HTTPS request data.",
@@ -399,7 +399,7 @@ def file_summary_generation():
                 }
             ]
             df_new_data = pd.DataFrame(new_data)
-            df_new_data.to_excel(excel_path, index=False, engine="openpyxl")
+            save_dataframe_to_excel(data=df_new_data, excel_path=excel_path)
             return jsonify(
                 {
                     "message": "New Excel file created and data added.",

@@ -7,7 +7,7 @@ from prettytable import PrettyTable
 from tqdm import tqdm
 from endpoints.github_metadata import github_metadata_endpoint_handler
 from endpoints.clone_github import clone_repo_endpoint_handler
-from utils import handle_metadata_and_clone
+from utils import handle_metadata_and_clone, save_dataframe_to_excel
 from utils.llama_configurations import get_description_data, model
 from constants import ignore_list_folder_structure, specific_ignores_api
 import pandas as pd
@@ -218,7 +218,7 @@ def update_https_requests_endpoint():
 
             # Save the updated data to Excel
             df_updated_data = pd.DataFrame(existing_data)
-            df_updated_data.to_excel(excel_path, index=False, engine="openpyxl")
+            save_dataframe_to_excel(data=df_updated_data, excel_path=excel_path)
             return jsonify(
                 {
                     "message": "Excel file updated with HTTPS request data.",
@@ -230,7 +230,7 @@ def update_https_requests_endpoint():
             # Create a new Excel file with the data
             new_data = [{"File": str(file_path), "api_reference": api_text}]
             df_new_data = pd.DataFrame(new_data)
-            df_new_data.to_excel(excel_path, index=False, engine="openpyxl")
+            save_dataframe_to_excel(data=df_new_data, excel_path=excel_path)
             return jsonify(
                 {
                     "message": "New Excel file created and data added.",
@@ -319,7 +319,7 @@ def get_api_references():
             df_api_data = pd.DataFrame(api_data_for_excel)
 
             # Save the DataFrame to an Excel file with the specified path
-            df_api_data.to_excel(excel_path, index=False, engine="openpyxl")
+            save_dataframe_to_excel(data=df_api_data, excel_path=excel_path)
 
             print(f"API reference data saved to {str(excel_path)}")
 

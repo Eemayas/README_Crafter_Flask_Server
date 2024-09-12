@@ -6,10 +6,15 @@ from tqdm import tqdm
 from utils.llama_configurations import ollama
 from flask_cors import CORS  # Import CORS
 import json
+import argparse
+import global_variables
 
 from endpoints.github_metadata import github_metadata_endpoint
 from endpoints.clone_github import clone_repo_endpoint
-from endpoints.folder_structure import folder_structure_endpoint, folder_structure_dict_endpoint
+from endpoints.folder_structure import (
+    folder_structure_endpoint,
+    folder_structure_dict_endpoint,
+)
 from endpoints.ollam_check import ask_question
 from endpoints.project_installation_guide import project_installation_guide
 from endpoints.project_image import get_project_icon
@@ -32,7 +37,7 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 
-@app.route("/")
+@app.route("/hello")
 def home():
     return "Hello, Flask!"
 
@@ -174,8 +179,22 @@ def progress():
 
 
 if __name__ == "__main__":
-    # Ensure the model is pulled when the server starts
-    subprocess.run(["ollama", "pull", "llama3.1:8b"], check=True)
+    parser = argparse.ArgumentParser(description="README Generator with collab")
+    parser.add_argument(
+        "--collab", type=bool, default=False, help="A boolean flag for collab"
+    )
+    args = parser.parse_args()
+    global_variables.global_is_collab = args.collab
+
+    print(
+        "\nExecuting on the collab...........\n"
+        if args.collab
+        else "\nExecuting on the local device...........\n"
+    )
+
+    if not global_variables.global_is_collab:
+        subprocess.run(["ollama", "pull", "llama3.1:8b"], check=True)
+
     ollama_thread = threading.Thread(target=ollama)
     ollama_thread.start()
 

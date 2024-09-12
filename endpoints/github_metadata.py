@@ -159,6 +159,9 @@ async def fetch_git_repository_metadata(
 def metadata_to_dict(metadata: RepositoryMetadata) -> dict:
     metadata_dict = {}
 
+    if not isinstance(metadata,RepositoryMetadata):
+        return 
+    
     for field in metadata.__dataclass_fields__:
         value = getattr(metadata, field)
         if isinstance(value, dict):

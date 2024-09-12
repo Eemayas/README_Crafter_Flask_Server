@@ -1,11 +1,10 @@
 import os
 import subprocess
 from lightrag.components.model_client import OllamaClient
+import global_variables
 
 # Create the model selection
 model = {"model_client": OllamaClient(), "model_kwargs": {"model": "llama3.1:8b"}}
-
-collab = 0
 
 
 def ollama():
@@ -28,7 +27,7 @@ def ollama():
     Returns:
     None
     """
-    if collab:
+    if global_variables.global_is_collab:
         os.environ["OLLAMA_HOST"] = "0.0.0.0:11434"
         os.environ["OLLAMA_ORIGINS"] = "*"
         subprocess.Popen(["ollama", "serve"])
