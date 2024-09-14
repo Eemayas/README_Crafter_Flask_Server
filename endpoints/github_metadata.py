@@ -159,9 +159,9 @@ async def fetch_git_repository_metadata(
 def metadata_to_dict(metadata: RepositoryMetadata) -> dict:
     metadata_dict = {}
 
-    if not isinstance(metadata,RepositoryMetadata):
-        return 
-    
+    if not isinstance(metadata, RepositoryMetadata):
+        return
+
     for field in metadata.__dataclass_fields__:
         value = getattr(metadata, field)
         if isinstance(value, dict):
@@ -217,6 +217,10 @@ def github_metadata_endpoint_handler():
 def github_metadata_endpoint():
     metadata = github_metadata_endpoint_handler()
     if metadata:
-        return jsonify({"metadata": metadata_to_dict(metadata)}), 200
+        try:
+            metadata_dict = metadata_to_dict(metadata)
+            return jsonify({"metadata": metadata_dict}), 200
+        except Exception as e:
+            return jsonify({"error": "Failed to parse repository metadata Dict"}), 500
     else:
         return jsonify({"error": "Failed to fetch repository metadata"}), 500

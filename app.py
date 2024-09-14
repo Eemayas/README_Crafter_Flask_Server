@@ -37,6 +37,11 @@ app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
 
 
+@app.route("/")
+def home():
+    return "Flask is up and runing!"
+
+
 @app.route("/hello")
 def home():
     return "Hello, Flask!"
