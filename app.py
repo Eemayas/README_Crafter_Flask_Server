@@ -43,7 +43,7 @@ def home():
 
 
 @app.route("/hello")
-def home():
+def hello():
     return "Hello, Flask!"
 
 
