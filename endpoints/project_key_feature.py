@@ -1,12 +1,14 @@
 from flask import jsonify, request
-import global_variables
+
 from lightrag.core.generator import Generator
 from lightrag.core.component import Component
-from lightrag.components.model_client import OllamaClient
-from utils.llama_configurations import get_description_data, model
-from endpoints.summary_generation import summary_generation_handler
-from utils.check_new_repo_request import check_new_repo_requent
 
+import global_variables
+
+from endpoints.summary_generation import summary_generation_handler
+
+from utils.llama_configurations import get_description_data, model
+from utils.check_new_repo_request import check_new_repo_requent
 
 key_feature_template = r"""<SYS>
 You are an expert computer engineer specializing in project documentation and coding, with advanced knowledge of various programming technologies.

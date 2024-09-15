@@ -1,5 +1,7 @@
 from flask import jsonify, request
+
 from constants import project_icons
+
 import global_variables
 
 

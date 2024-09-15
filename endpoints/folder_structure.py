@@ -1,13 +1,14 @@
-from pathlib import Path
-from typing import List
 from flask import jsonify, request
-from typing import List
-from constants import ignore_list_folder_structure
-from endpoints.clone_github import clone_repo_endpoint_handler
-from utils.check_new_repo_request import check_new_repo_requent
-from utils.check_new_repo_request import check_new_repo_requent
+
+from pathlib import Path
+from typing import List, Dict
+
 import global_variables
+
+from constants import ignore_list_folder_structure
+
 from utils.handle_metadata_and_clone import handle_metadata_and_clone
+from utils.check_new_repo_request import check_new_repo_requent
 
 
 def print_folder_structure(

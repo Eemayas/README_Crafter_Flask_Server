@@ -1,5 +1,6 @@
-from flask import Flask, request, jsonify
 import re
+from flask import request, jsonify
+
 from utils.check_new_repo_request import check_new_repo_requent
 
 

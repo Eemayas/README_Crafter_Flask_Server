@@ -1,15 +1,17 @@
-import subprocess
-import threading
-import time
-from flask import Flask, Response, request
-from tqdm import tqdm
-from utils.llama_configurations import ollama
-from flask_cors import CORS  # Import CORS
 import json
+import time
 import argparse
+import threading
+import subprocess
+from tqdm import tqdm
+from flask_cors import CORS  # Import CORS
+from flask import request, Response, Flask
+
 import global_variables
 
-from endpoints.github_metadata import github_metadata_endpoint
+from endpoints.github_metadata import (
+    github_metadata_endpoint,
+)
 from endpoints.clone_github import clone_repo_endpoint
 from endpoints.folder_structure import (
     folder_structure_endpoint,
@@ -32,6 +34,7 @@ from endpoints.summary_generation import (
     file_summary_generation,
     summary_generation_handler_stream,
 )
+
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
