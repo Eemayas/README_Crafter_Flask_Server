@@ -2,6 +2,7 @@ from flask import jsonify, request
 
 from lightrag.core.generator import Generator
 from lightrag.core.component import Component
+from lightrag.components.model_client import OllamaClient
 
 import global_variables
 

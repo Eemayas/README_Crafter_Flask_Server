@@ -34,6 +34,7 @@ from endpoints.summary_generation import (
     file_summary_generation,
     summary_generation_handler_stream,
 )
+from utils.llama_configurations import ollama
 
 
 app = Flask(__name__)

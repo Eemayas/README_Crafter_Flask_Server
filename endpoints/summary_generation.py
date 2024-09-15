@@ -1,6 +1,7 @@
 import os
 import json
 import time
+import typing
 import pandas as pd
 from tqdm import tqdm
 from flask import jsonify, request, Response, stream_with_context
@@ -11,21 +12,23 @@ from typing import List, Dict
 
 from lightrag.core.generator import Generator
 from lightrag.core.component import Component
+from lightrag.components.model_client import OllamaClient
 
 import global_variables
 
-from constants import (
-    ignore_list_folder_structure,
-)
+from constants import ignore_list_folder_structure
 
-from endpoints.github_metadata import github_metadata_endpoint_handler
+
+from endpoints.github_metadata import (
+    github_metadata_endpoint_handler,
+)
 from endpoints.clone_github import clone_repo_endpoint_handler
-from endpoints.summary_generation import summary_generation_handler
 
 from utils.save_dataframe_to_excel import save_dataframe_to_excel
 from utils.handle_metadata_and_clone import handle_metadata_and_clone
 from utils.llama_configurations import get_description_data, model
 from utils.check_new_repo_request import check_new_repo_requent
+
 
 summary_template = r"""<SYS>
 You are a summarization assistant specialized in coding files.
