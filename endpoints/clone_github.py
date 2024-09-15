@@ -28,28 +28,28 @@ async def clone_github_repo(
     if not os.path.exists(target_path):
         # Ensure the target folder exists
         os.makedirs(target_folder, exist_ok=True)
-        print(f"Cloning repository from {repository_url} into {target_path}...")
+        print(f"\nCloning repository from {repository_url} into {target_path}...\n")
 
         try:
             # Run the git clone command to clone the repository
             subprocess.run(["git", "clone", repository_url, target_path], check=True)
-            print(f"Repository cloned into {target_path}/")
+            print(f"\nRepository cloned into {target_path}\n")
 
             # # Remove the .git folder to clean up the cloned repository
             # git_folder_path = os.path.join(target_path, ".git")
             # if os.path.exists(git_folder_path):
             #     shutil.rmtree(git_folder_path)
-            #     print(f"Removed .git folder from {target_path}/")
+            #     print(f"\nRemoved .git folder from {target_path}\n")
 
             # Return the path to the cloned repository
             return target_path
         except subprocess.CalledProcessError as e:
             # Handle errors that occur during the cloning process
-            print(f"Error cloning repository: {e}")
+            print(f"\nError cloning repository: {e}\n")
             return None
     else:
         # If the repository folder already exists, skip the cloning process
-        print(f"Repository folder '{target_path}' already exists. Skipping clone.")
+        print(f"\nRepository folder '{target_path}' already exists. Skipping clone.\n")
         return target_path
 
 

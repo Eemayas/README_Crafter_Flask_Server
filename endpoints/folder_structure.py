@@ -107,7 +107,7 @@ def folder_structure_endpoint_handler():
         global_variables.global_folder_structure_str = folder_structure
         return folder_structure_markdown
     else:
-        print("Repository cloning failed or was skipped.")
+        print("\nRepository cloning failed or was skipped.\n")
 
 
 from pathlib import Path

@@ -125,13 +125,13 @@ def project_installation_guide():
 
     if not global_variables.global_combined_summary:
         print(
-            "project_installation_guide -- Global combined summary is empty. Generating summary..."
+            "\nproject_installation_guide -- Global combined summary is empty. Generating summary...\n"
         )
         summary_generation_handler()
 
     if not global_variables.global_folder_structure_str:
         print(
-            "project_installation_guide -- Global folder structure string is empty. Fetching folder structure..."
+            "\nproject_installation_guide -- Global folder structure string is empty. Fetching folder structure...\n"
         )
         folder_structure_endpoint_handler()
 

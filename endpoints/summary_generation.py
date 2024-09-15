@@ -10,7 +10,7 @@ from prettytable import PrettyTable
 from tqdm import tqdm
 from endpoints.github_metadata import github_metadata_endpoint_handler
 from endpoints.clone_github import clone_repo_endpoint_handler
-from utils import save_dataframe_to_excel
+from utils.save_dataframe_to_excel import save_dataframe_to_excel
 from utils.handle_metadata_and_clone import handle_metadata_and_clone
 from utils.llama_configurations import model, get_description_data
 from constants import ignore_list_folder_structure, ignore_list_extensions
@@ -182,7 +182,7 @@ def save_summary_to_excel_and_print_table(
         # Save DataFrame to an Excel file
         save_dataframe_to_excel(data=summary_df, excel_path=excel_path)
     else:
-        print("No summary data available to save or print.")
+        print("\nNo summary data available to save or print.\n")
 
 
 summary_qa = SummaryQA(**model)
@@ -333,6 +333,8 @@ def file_summary_generation():
     if not file_path:
         return jsonify({"error": "Missing 'file_path' parameter"}), 400
 
+    print(f"\nProcessing file - {file_path}")
+
     handle_metadata_and_clone(function_name="file_summary_generation")
 
     excel_path = Path(f"output/{global_variables.global_metadata.name}_summary.xlsx")
@@ -418,7 +420,7 @@ def stream_data():
             return
 
         if not global_variables.global_metadata:
-            print("No global metadata found. Retrieving metadata.....")
+            print("\nNo global metadata found. Retrieving metadata.....\n")
             github_metadata_endpoint_handler()
 
             if not global_variables.global_metadata:
@@ -429,7 +431,7 @@ def stream_data():
             time.sleep(1)
 
         if not global_variables.global_cloned_repo_path:
-            print("No clone folder found. Cloning Folder.....")
+            print("\nNo clone folder found. Cloning Folder.....\n")
             clone_repo_endpoint_handler()
 
             if not global_variables.global_cloned_repo_path:
@@ -587,12 +589,12 @@ def summary_generation_handler_stream():
     @stream_with_context
     def generate_and_stream_summary():
         if not global_variables.global_metadata:
-            print("No global metadata found. Retrieving metadata.....")
+            print("\nNo global metadata found. Retrieving metadata.....\n")
             github_metadata_endpoint_handler()
             yield "event: status\ndata: Retrieved GitHub metadata\n\n"
 
         if not global_variables.global_cloned_repo_path:
-            print("No clone folder found. Cloning Folder.....")
+            print("\nNo clone folder found. Cloning Folder.....\n")
             clone_repo_endpoint_handler()
             yield "event: status\ndata: Repository cloned\n\n"
 

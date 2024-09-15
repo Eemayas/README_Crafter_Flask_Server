@@ -1,16 +1,11 @@
 import global_variables
-import logging
-
-logging.basicConfig(level=logging.INFO)
-
-logging.info("New Repository requested. Resetting global variables...")
 
 
 def check_new_repo_requent(repository_url):
     try:
         # Check if the repository URL is the same as the global one
         if global_variables.global_repository_url != repository_url:
-            logging.info("New Repository requested. Resetting global variables....")
+            print("New Repository requested. Resetting global variables....\n")
             # Reset global variables for the new repository
             global_variables.global_repository_url = repository_url
             global_variables.global_metadata = None
@@ -27,13 +22,11 @@ def check_new_repo_requent(repository_url):
 
             return True
         else:
-            logging.info(
-                "Same repository requested. Using existing global variables......"
-            )
+            print("Same repository requested. Using existing global variables......\n")
             return False
     except OSError as e:
-        logging.info(f"An I/O error occurred: {e}")
+        print(f"An I/O error occurred: {e}\n")
         return False
     except Exception as e:
-        logging.info(f"An unexpected error occurred:{e}")
+        print(f"An unexpected error occurred:{e}\n")
         return False

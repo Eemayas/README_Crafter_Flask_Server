@@ -321,7 +321,7 @@ def get_api_references():
             # Save the DataFrame to an Excel file with the specified path
             save_dataframe_to_excel(data=df_api_data, excel_path=excel_path)
 
-            print(f"API reference data saved to {str(excel_path)}")
+            print(f"\nAPI reference data saved to {str(excel_path)}\n")
 
         return jsonify(
             {

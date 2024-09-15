@@ -91,7 +91,9 @@ def project_key_feature():
     check_new_repo_requent(repository_url=repository_url)
 
     if not global_variables.global_combined_summary:
-        print("project_key_feature -- Global combined summary is empty. Generating summary...")
+        print(
+            "\nproject_key_feature -- Global combined summary is empty. Generating summary...\n"
+        )
         summary_generation_handler()
 
     # Initialize FeatureQA component with model configuration

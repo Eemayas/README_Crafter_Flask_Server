@@ -18,4 +18,4 @@ def save_dataframe_to_excel(data, excel_path):
 
     # Save the DataFrame to an Excel file
     data.to_excel(excel_path, index=False, engine="openpyxl")
-    print(f"Summary saved to {excel_path}")
+    print(f"\nSummary saved to {excel_path}\n")

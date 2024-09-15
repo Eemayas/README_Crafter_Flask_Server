@@ -100,7 +100,7 @@ def project_overview():
 
     if not global_variables.global_combined_summary:
         print(
-            "project_overview -- Global combined summary is empty. Generating summary..."
+            "\nproject_overview -- Global combined summary is empty. Generating summary...\n"
         )
         summary_generation_handler()
 

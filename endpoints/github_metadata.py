@@ -152,7 +152,7 @@ async def fetch_git_repository_metadata(
         )
         return _parse_repository_metadata(metadata, contributors) if metadata else None
     except aiohttp.ClientError as exc:
-        print(f"Client error while fetching repository metadata: {exc}")
+        print(f"\nClient error while fetching repository metadata: {exc}\n")
         return None
 
 
