@@ -16,8 +16,7 @@ from lightrag.components.model_client import OllamaClient
 
 import global_variables
 
-from constants import ignore_list_folder_structure
-
+from constants import ignore_list_folder_structure, ignore_list_extensions
 
 from endpoints.github_metadata import (
     github_metadata_endpoint_handler,

@@ -17,7 +17,7 @@ from endpoints.folder_structure import (
     folder_structure_endpoint,
     folder_structure_dict_endpoint,
 )
-from endpoints.ollam_check import ask_question
+from endpoints.ollam_check import ollama_check_endpoint
 from endpoints.project_installation_guide import project_installation_guide
 from endpoints.project_image import get_project_icon
 from endpoints.project_name import get_project_name
@@ -51,6 +51,11 @@ def hello():
     return "Hello, Flask!"
 
 
+@app.route("/ollama", methods=["GET"])
+def ollama_check_endpoint_main():
+    return ollama_check_endpoint()
+
+
 @app.route("/github_metadata", methods=["GET"])
 def github_metadata_endpoint_main():
     return github_metadata_endpoint()
@@ -69,11 +74,6 @@ def folder_structure_endpoint_main():
 @app.route("/folder_structure_dict", methods=["GET"])
 def folder_structure_dict_endpoint_main():
     return folder_structure_dict_endpoint()
-
-
-@app.route("/ask", methods=["POST"])
-def ask_question_endpoint_main():
-    return ask_question()
 
 
 @app.route("/summary_generation", methods=["GET"])

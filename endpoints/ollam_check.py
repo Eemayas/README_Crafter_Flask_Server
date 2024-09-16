@@ -46,3 +46,13 @@ def ask_question():
         return jsonify({"question": question, "answer": answer})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+def ollama_check_endpoint():
+    question = "What is Flask?"
+    try:
+        # Generate the answer using the SimpleQA component
+        answer = simple_qa.call({"input_str": question})
+        return jsonify({"question": question, "answer": answer})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
