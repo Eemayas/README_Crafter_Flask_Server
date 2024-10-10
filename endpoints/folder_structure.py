@@ -19,7 +19,7 @@ def print_folder_structure(
     file_folder_to_be_ignored: List[str] = None,
 ) -> List[str]:
     """
-    Generate a visual tree structure of the directory contents.
+    Generate a visual tree structure of the directory contents with relative paths from the root folder.
 
     Parameters:
     dir_path (Path): The root directory to start the tree from.
@@ -43,33 +43,38 @@ def print_folder_structure(
     if file_folder_to_be_ignored is None:
         file_folder_to_be_ignored = []
 
-    def inner(dir_path: Path, prefix: str = "", level: int = -1):
+    def inner(current_path: Path, prefix: str = "", level: int = -1):
         nonlocal files, directories
         if level == 0:
             return  # Stop recursion if level is 0
         if limit_to_directories:
             contents = [
                 d
-                for d in dir_path.iterdir()
+                for d in current_path.iterdir()
                 if d.is_dir() and d.name not in file_folder_to_be_ignored
             ]
         else:
             contents = [
-                d for d in dir_path.iterdir() if d.name not in file_folder_to_be_ignored
+                d
+                for d in current_path.iterdir()
+                if d.name not in file_folder_to_be_ignored
             ]
         pointers = [tee] * (len(contents) - 1) + [last]
         for pointer, path in zip(pointers, contents):
+            relative_path = path.relative_to(
+                dir_path
+            )  # Relative path from the root folder
             if path.is_dir():
-                output.append(prefix + pointer + path.name + "/")
+                output.append(f"{prefix}{pointer}[{path.name}]({relative_path})/ ")
                 directories += 1
                 extension = branch if pointer == tee else space
                 inner(path, prefix=prefix + extension, level=level - 1)
             elif not limit_to_directories:
-                output.append(prefix + pointer + path.name)
+                output.append(f"{prefix}{pointer}[{path.name}]({relative_path})")
                 files += 1
 
     # Add the root directory name
-    output.append(dir_path.name + "/")
+    output.append(f"[{dir_path.name}](.)/ ")
     # Create an iterator from the inner function
     inner(dir_path, level=level)
     # Limit the output by length_limit
@@ -111,11 +116,7 @@ def folder_structure_endpoint_handler():
         print("\nRepository cloning failed or was skipped.\n")
 
 
-from pathlib import Path
-from typing import List, Dict
-
-
-def get_folder_structure(
+def get_folder_structure_dict(
     dir_path: Path,
     level: int = -1,
     limit_to_directories: bool = False,
@@ -177,7 +178,7 @@ def folder_structure_dict_endpoint():
     handle_metadata_and_clone(function_name="folder_structure_dict_endpoint")
 
     if global_variables.global_cloned_repo_path:
-        folder_structure = get_folder_structure(
+        folder_structure = get_folder_structure_dict(
             Path(global_variables.global_cloned_repo_path),
             file_folder_to_be_ignored=ignore_list_folder_structure,
         )
