@@ -25,7 +25,7 @@ def get_project_name():
 <p align="center">
     <h1 align="center">{global_variables.global_metadata.name}</h1>
 </p>
-            """
+"""
         global_variables.global_project_name = project_name_markdown
         return jsonify({"project_name_markdown": project_name_markdown}), 200
 

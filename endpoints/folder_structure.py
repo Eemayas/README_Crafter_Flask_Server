@@ -61,20 +61,23 @@ def print_folder_structure(
             ]
         pointers = [tee] * (len(contents) - 1) + [last]
         for pointer, path in zip(pointers, contents):
-            relative_path = path.relative_to(
-                dir_path
-            )  # Relative path from the root folder
+            # relative_path = path.relative_to(
+            #     dir_path
+            # )  # Relative path from the root folder
             if path.is_dir():
-                output.append(f"{prefix}{pointer}[{path.name}]({relative_path})/ ")
+                output.append(f"{prefix}{pointer}{path.name}/ ")
+                # output.append(f"{prefix}{pointer}[{path.name}]({relative_path})/ ")
                 directories += 1
                 extension = branch if pointer == tee else space
                 inner(path, prefix=prefix + extension, level=level - 1)
             elif not limit_to_directories:
-                output.append(f"{prefix}{pointer}[{path.name}]({relative_path})")
+                output.append(f"{prefix}{pointer}{path.name}")
+                # output.append(f"{prefix}{pointer}[{path.name}]({relative_path})")
                 files += 1
 
     # Add the root directory name
-    output.append(f"[{dir_path.name}](.)/ ")
+    # output.append(f"[{dir_path.name}](.)/ ")
+    output.append(f"{dir_path.name}/ ")
     # Create an iterator from the inner function
     inner(dir_path, level=level)
     # Limit the output by length_limit
@@ -82,7 +85,7 @@ def print_folder_structure(
         output = output[:length_limit]
         output.append(f"... length_limit, {length_limit}, reached, counted:")
     # Add the summary of directories and files
-    output.append(
+    output.append(  
         f"\n{directories} directories" + (f", {files} files" if files else "")
     )
 
