@@ -80,8 +80,11 @@ def clone_repo_endpoint():
     cloned_repo_path = clone_repo_endpoint_handler()
 
     if cloned_repo_path:
-        return jsonify(
-            {"message": "Repository cloned successfully", "path": cloned_repo_path}, 200
+        return (
+            jsonify(
+                {"message": "Repository cloned successfully", "path": cloned_repo_path}
+            ),
+            200,
         )
     else:
         return jsonify({"error": "Failed to clone repository"}), 500
